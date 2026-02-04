@@ -162,11 +162,21 @@ AskUserQuestion:
 다음 단계는?"
 
 옵션:
-1. 이어서 구현 계획 (Recommended)
-2. 오늘은 여기까지
+1. 구현 계획 세우기 (Recommended) - 복잡한 작업
+2. 바로 구현 - Design Issue 기반, Epic 없이 (간단한 작업)
+3. 오늘은 여기까지
 ```
+
+**바로 구현 선택 시:**
+- impl.md, Epic 생성 생략
+- Design Issue를 참조하여 TDD로 구현
+- **REQUIRED:** Use using-git-worktrees 스킬
+- **REQUIRED:** Use test-driven-development 스킬
+- 커밋에 `Refs #[design-issue-number]` 포함
+- PR에서 `Closes #[design-issue-number]`
 
 ## 관련 스킬
 
-- **writing-plans**: design.md → impl.md → GitHub 이슈
+- **writing-plans**: design.md → impl.md → Epic (복잡한 작업)
+- **using-git-worktrees**: 격리된 작업 공간
 - **test-driven-development**: TDD 구현
