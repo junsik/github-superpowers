@@ -7,23 +7,38 @@ description: Use when working on Next.js frontend with FSD architecture, Zustand
 
 ## Overview
 
-Next.js + Feature-Sliced Design + Zustand + React Query + shadcn/ui 스택의 best practices입니다.
+Next.js 16 + Feature-Sliced Design + Zustand + React Query + shadcn/ui 스택의 best practices입니다.
 
 **핵심 철학:** "레이어로 분리하고, 상위에서 하위로만 의존한다."
 
 **이 스킬은 참조용입니다.** 코드 작성 시 이 패턴을 따르세요.
 
-## FSD 레이어 구조
+## Core Design Principles
+
+1. **Minimize noise** - 아이콘으로 소통, 과도한 레이블 지양
+2. **No generic AI-UI** - 보라색 그라데이션, 과도한 그림자, 예측 가능한 레이아웃 피하기
+3. **Context over decoration** - 모든 요소는 목적이 있어야 함
+4. **Theme consistency** - `globals.css` CSS 변수 사용, 색상 하드코딩 금지
+
+## FSD 레이어 구조 (with shadcn)
 
 ```
 src/
 ├── app/                    # App layer - Next.js App Router, providers
-│   ├── (auth)/            # Route groups
+│   ├── (protected)/       # Auth required routes
+│   │   ├── dashboard/
+│   │   ├── settings/
+│   │   ├── components/    # Route-specific components
+│   │   └── lib/           # Route-specific utils/types
+│   ├── (public)/          # Public routes
+│   │   ├── login/
+│   │   └── register/
+│   ├── actions/           # Server Actions (global)
 │   ├── api/               # API routes
 │   ├── providers.tsx      # Global providers
 │   ├── layout.tsx
+│   ├── globals.css        # Theme tokens
 │   └── page.tsx
-├── pages/                  # Pages layer (if using pages router)
 ├── widgets/                # Widget layer - 독립적인 UI 블록
 │   └── header/
 │       ├── ui/
@@ -40,11 +55,18 @@ src/
 │       ├── model/         # Entity types & stores
 │       ├── ui/            # Entity UI components
 │       └── index.ts
-└── shared/                 # Shared layer - 재사용 가능한 코드
-    ├── api/               # API client
-    ├── config/            # Environment config
-    ├── lib/               # Utilities
-    └── ui/                # shadcn/ui components
+├── shared/                 # Shared layer - 재사용 가능한 코드
+│   ├── api/               # API client
+│   ├── config/            # Environment config
+│   ├── lib/               # Utilities (cn, utils)
+│   └── ui/                # shadcn/ui components
+├── components/             # Non-FSD shared components
+│   ├── ui/                # shadcn primitives (alternative location)
+│   ├── layout/            # Layout components (sidebar, nav)
+│   ├── backgrounds/       # Grid, Dot, Gradient patterns
+│   └── animations/        # FadeIn, ScrollReveal
+├── hooks/                  # Custom React hooks
+└── data/                   # Database queries ("use cache")
 ```
 
 ## 레이어 의존성 규칙
@@ -62,17 +84,153 @@ app → pages → widgets → features → entities → shared
 - ❌ entities → features (금지)
 - ❌ shared → 어떤 레이어도 의존 금지
 
-## Slice 구조
+## Next.js 16 Features
 
-각 레이어의 슬라이스는 동일한 구조:
+### Async Params
+
+```tsx
+export default async function Page({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const { id } = await params;
+  const { q } = await searchParams;
+}
+```
+
+### Data Fetching vs Server Actions
+
+**CRITICAL RULE:**
+- **Server Actions** = ONLY for mutations (create, update, delete)
+- **Data fetching** = In Server Components or `'use cache'` functions
+
+```tsx
+// ❌ WRONG: Server Action for data fetching
+"use server"
+export async function getUsers() {
+  return await db.users.findMany()
+}
+
+// ✅ CORRECT: Data function with caching
+// data/users.ts
+export async function getUsers() {
+  "use cache"
+  cacheTag("users")
+  cacheLife("hours")
+  return await db.users.findMany()
+}
+
+// ✅ CORRECT: Read cookies in Server Component directly
+export default async function Page() {
+  const theme = (await cookies()).get("theme")?.value ?? "light"
+  return <App theme={theme} />
+}
+```
+
+### Caching
+
+```tsx
+"use cache";
+
+import { cacheTag, cacheLife } from "next/cache";
+
+export async function getProducts() {
+  cacheTag("products");
+  cacheLife("hours");
+  return await db.products.findMany();
+}
+```
+
+### Server Actions (Mutations Only)
+
+```tsx
+"use server";
+
+import { updateTag, revalidateTag } from "next/cache";
+import { z } from "zod";
+
+const schema = z.object({
+  title: z.string().min(1),
+  content: z.string(),
+});
+
+export async function createPost(formData: FormData) {
+  // Always validate input
+  const parsed = schema.parse({
+    title: formData.get("title"),
+    content: formData.get("content"),
+  });
+
+  await db.insert(posts).values(parsed);
+  updateTag("posts"); // Read-your-writes
+}
+```
+
+### Proxy API
+
+Use `proxy.ts` for request interception (replaces middleware). Place at project root:
+
+```tsx
+// proxy.ts (project root, same level as app/)
+import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
+
+export function proxy(request: NextRequest) {
+  // Auth checks, redirects, etc.
+}
+
+export const config = {
+  matcher: ['/dashboard/:path*'],
+}
+```
+
+## Component Patterns
+
+### Client Boundaries
+
+- `"use client"` only at leaf components (smallest boundary)
+- Props must be serializable (data or Server Actions, no functions/classes)
+- Pass server content via `children`
+
+### className Pattern
+
+Always accept and merge `className`:
+
+```tsx
+import { cn } from "@/lib/utils"
+
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: "default" | "outline"
+}
+
+export function Card({ className, variant = "default", ...props }: CardProps) {
+  return (
+    <div
+      className={cn(
+        "rounded-lg p-4",
+        variant === "outline" && "border",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+```
+
+### Server vs Client Decision Tree
 
 ```
-{slice}/
-├── api/           # API 호출, React Query hooks
-├── model/         # 상태 관리, Zustand stores, types
-├── ui/            # UI 컴포넌트
-├── lib/           # 유틸리티 (해당 slice 전용)
-└── index.ts       # Public API (re-exports)
+Need state/effects/browser APIs?
+├── Yes → "use client" at smallest boundary
+└── No → Server Component (default)
+
+Passing data to client?
+├── Functions/classes → ❌ Not serializable
+├── Plain objects/arrays → ✅ Props
+└── Server logic → ✅ Server Actions
 ```
 
 ## Zustand Store 패턴 (FSD)
@@ -195,40 +353,6 @@ export function Header() {
 }
 ```
 
-## Entity UI 컴포넌트
-
-```typescript
-// entities/user/ui/user-card.tsx
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
-import { User } from '../model/user.types'
-
-interface UserCardProps {
-  user: User
-  actions?: React.ReactNode  // slot for feature-level actions
-}
-
-export function UserCard({ user, actions }: UserCardProps) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Avatar>
-            <AvatarImage src={user.avatar} />
-            <AvatarFallback>{user.name[0]}</AvatarFallback>
-          </Avatar>
-          {user.name}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className="text-muted-foreground">{user.email}</p>
-        {actions}
-      </CardContent>
-    </Card>
-  )
-}
-```
-
 ## Form with Zod + React Hook Form
 
 ```typescript
@@ -283,78 +407,6 @@ export function UserForm({ onSubmit, defaultValues }) {
 }
 ```
 
-## API Client (Shared)
-
-```typescript
-// shared/api/client.ts
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL
-
-async function fetchAPI<T>(
-  endpoint: string,
-  options?: RequestInit
-): Promise<T> {
-  const { useAuthStore } = await import('@/features/auth')
-  const token = useAuthStore.getState().token
-
-  const res = await fetch(`${BASE_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...options?.headers,
-    },
-  })
-
-  if (!res.ok) {
-    const error = await res.json()
-    throw new Error(error.message || 'API Error')
-  }
-
-  return res.json()
-}
-
-export const api = {
-  users: {
-    list: (filters?: string) => fetchAPI<User[]>(`/users?${filters}`),
-    get: (id: string) => fetchAPI<User>(`/users/${id}`),
-    create: (data: CreateUser) => fetchAPI<User>('/users', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    }),
-  },
-}
-```
-
-## Server vs Client Components
-
-```typescript
-// app/users/page.tsx (Server Component)
-import { UserList } from '@/widgets/user-list'
-import { AddUserButton } from '@/features/user'
-
-export default async function UsersPage() {
-  // 서버에서 초기 데이터 fetch
-  const initialUsers = await fetch('/api/users').then(r => r.json())
-
-  return (
-    <div>
-      <UserList initialUsers={initialUsers} />
-      <AddUserButton /> {/* Client Component */}
-    </div>
-  )
-}
-
-// features/user/ui/add-user-button.tsx
-'use client'
-
-import { useCreateUser } from '../api/user.mutations'
-
-export function AddUserButton() {
-  const { mutate, isPending } = useCreateUser()
-  // ...
-}
-```
-
 ## Import Aliases
 
 ```typescript
@@ -373,6 +425,13 @@ export function AddUserButton() {
 }
 ```
 
+## References
+
+- **Architecture**: [references/architecture.md](references/architecture.md) - Server/Client patterns, Suspense, data fetching
+- **Styling**: [references/styling.md](references/styling.md) - Themes, fonts, animations, background patterns
+- **Sidebar**: [references/sidebar.md](references/sidebar.md) - shadcn sidebar with nested layouts
+- **Project Setup**: [references/project-setup.md](references/project-setup.md) - Commands, presets
+
 ## 체크리스트
 
 ### FSD 아키텍처
@@ -381,10 +440,16 @@ export function AddUserButton() {
 - [ ] 각 slice의 public API(index.ts)만 export하는가?
 - [ ] shared/에 비즈니스 로직이 없는가?
 
+### Next.js 16
+- [ ] Server Actions는 mutation만 사용하는가?
+- [ ] Data fetching은 Server Component 또는 "use cache"인가?
+- [ ] async params/searchParams를 await하는가?
+
 ### 코드 품질
 - [ ] Zustand selector로 필요한 state만 구독하는가?
 - [ ] React Query keys factory 패턴을 사용하는가?
 - [ ] Server Component 우선, 필요시만 Client Component?
+- [ ] className을 cn()으로 merge하는가?
 
 ## Red Flags
 
@@ -394,10 +459,13 @@ export function AddUserButton() {
 - shared에서 다른 레이어 import
 - 전체 Zustand state 구독
 - Server Component에서 hooks 사용
+- Server Actions으로 data fetching
 - API 키 클라이언트에 노출
+- 색상 하드코딩 (bg-blue-500 대신 bg-primary)
 
 **Always:**
 - slice의 index.ts로만 export
 - Query keys factory 패턴 사용
 - Form validation은 Zod + React Hook Form
-- shadcn/ui는 shared/ui/에 위치
+- shadcn/ui는 shared/ui/ 또는 components/ui/에 위치
+- CSS 변수로 테마 색상 사용

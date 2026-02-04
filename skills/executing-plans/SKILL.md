@@ -37,6 +37,18 @@ digraph executing {
 }
 ```
 
+## Step 0: Load Stack Patterns (if applicable)
+
+프로젝트 스택 감지 후 해당 패턴 스킬 참조:
+
+| 감지 방법 | 스킬 |
+|-----------|------|
+| `next.config.*` 또는 `package.json`에 `next` | **nextjs-frontend** |
+| `nest-cli.json` 또는 `package.json`에 `@nestjs/core` | **nestjs-backend** |
+| `pyproject.toml`에 `fastapi` 또는 `requirements.txt`에 `fastapi` | **fastapi-backend** |
+
+**감지되면:** 해당 스킬의 패턴/컨벤션을 코드 작성 시 따름
+
 ## Step 1: Load and Review Plan
 
 **1. 계획 로드:**
@@ -136,3 +148,8 @@ gh issue view $EPIC_NUMBER
 - **verification**: 완료 전 검증
 - **creating-prs**: PR 생성 (다음 단계)
 - **closing-issues**: Epic 종료
+
+**스택별 패턴 (자동 감지):**
+- **nextjs-frontend**: Next.js + FSD + shadcn/ui
+- **nestjs-backend**: NestJS + Hexagonal Architecture
+- **fastapi-backend**: FastAPI + Celery
