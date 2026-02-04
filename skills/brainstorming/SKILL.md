@@ -91,10 +91,23 @@ DESIGN_URL=$(gh issue create \
   --label "design" \
   --milestone "$MILESTONE_TITLE")  # 선택된 Milestone (없으면 생략)
 
-# Project Roadmap에 추가
-gh project item-add $PROJECT_NUMBER \
+# Project Roadmap에 추가 및 필드 설정
+ITEM_ID=$(gh project item-add $PROJECT_NUMBER \
   --owner $PROJECT_OWNER \
-  --url "$DESIGN_URL"
+  --url "$DESIGN_URL" \
+  --format json | jq -r '.id')
+
+# Project ID 조회
+PROJECT_ID=$(gh project list --owner $PROJECT_OWNER --format json | \
+  jq -r '.projects[] | select(.number=='$PROJECT_NUMBER') | .id')
+
+# 필드 ID 조회
+FIELDS=$(gh project field-list $PROJECT_NUMBER --owner $PROJECT_OWNER --format json)
+START_DATE_FIELD=$(echo "$FIELDS" | jq -r '.fields[] | select(.name=="Start Date") | .id')
+
+# Start Date 설정 (오늘)
+gh project item-edit --project-id $PROJECT_ID --id $ITEM_ID \
+  --field-id $START_DATE_FIELD --date "$(date +%Y-%m-%d)"
 
 # Issue 번호 추출
 DESIGN_NUMBER=$(echo "$DESIGN_URL" | grep -oE '[0-9]+$')
