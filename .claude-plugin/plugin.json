@@ -5,6 +5,8 @@
   "author": {
     "name": "junsik"
   },
+  "homepage": "https://github.com/junsik/github-superpowers",
+  "repository": "https://github.com/junsik/github-superpowers",
   "license": "MIT",
   "keywords": ["workflow", "github", "tdd", "debugging", "planning", "issues", "projects", "milestones"]
 }
