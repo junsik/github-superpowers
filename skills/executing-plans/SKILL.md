@@ -37,21 +37,6 @@ digraph executing {
 }
 ```
 
-## 컨텍스트 복구 (/clear 후 시작 시)
-
-```
-/clear 후 사용자 입력 예시:
-- "#43 구현해줘"
-- "#43 Task 3부터 이어서 해줘"
-- "impl.md 실행해줘"
-
-복구 순서:
-1. GitHub Issue 번호가 있으면 → `gh issue view #N` 으로 Epic 로드
-2. Task 번호가 있으면 → 해당 Task부터 시작
-3. 파일 경로가 있으면 → 해당 impl.md 읽기
-4. Epic 체크리스트에서 미완료 Task 확인 후 재개
-```
-
 ## Step 1: Load and Review Plan
 
 **1. 계획 로드:**

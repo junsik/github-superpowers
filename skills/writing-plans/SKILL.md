@@ -114,19 +114,6 @@ digraph after_plan {
 - 커밋 메시지에 `Refs #[epic-number]` 포함
 - 마지막 커밋/PR에서 `Closes #[epic-number]`
 
-## 컨텍스트 복구 (/clear 후 시작 시)
-
-```
-/clear 후 사용자 입력 예시:
-- "#42 구현 계획 세워줘"
-- "design.md 기반으로 impl.md 만들어줘"
-
-복구 순서:
-1. GitHub Issue 번호가 있으면 → `gh issue view #N` 으로 내용 로드
-2. 파일 경로가 있으면 → 해당 design.md 읽기
-3. 둘 다 없으면 → `docs/plans/` 에서 최신 *-design.md 찾기
-```
-
 ## 완료 후 (AskUserQuestion)
 
 impl.md 저장 + Epic 생성 후:
@@ -140,9 +127,8 @@ AskUserQuestion:
 다음 단계는?"
 
 옵션:
-1. `/clear` 후 구현 시작 → 새 세션에서 "#M 구현해줘"
-2. 이어서 구현 (컨텍스트 유지, 서브에이전트 사용)
-3. 오늘은 여기까지
+1. 이어서 구현 (Recommended, 서브에이전트 사용)
+2. 오늘은 여기까지
 ```
 
 ## Remember
