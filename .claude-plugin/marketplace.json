@@ -1,6 +1,6 @@
 {
-  "name": "github-superpowers",
-  "description": "Development marketplace for GitHub Superpowers plugin",
+  "name": "github-superpowers-marketplace",
+  "description": "Marketplace for GitHub Superpowers plugin",
   "owner": {
     "name": "junsik"
   },

@@ -25,7 +25,7 @@ marketplace 등록 후 설치:
 ```
 
 ```bash
-/plugin install github-superpowers@github-superpowers
+/plugin install github-superpowers@github-superpowers-marketplace
 ```
 
 ### 초기 설정
