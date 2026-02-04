@@ -28,18 +28,6 @@ marketplace 등록 후 설치:
 /plugin install github-superpowers@github-superpowers
 ```
 
-### 설치 확인
-
-```bash
-/help
-```
-
-```
-# 다음이 보여야 합니다:
-# /github-superpowers:setup - 초기 설정
-# /github-superpowers:milestone - 마일스톤 관리
-```
-
 ### 초기 설정
 
 처음 사용 시 `/init-github-superpowers` 명령어로 초기화:
