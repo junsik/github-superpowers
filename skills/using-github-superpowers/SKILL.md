@@ -17,7 +17,7 @@ description: Use when starting any conversation - establishes development workfl
 
 - `gh CLI` 인증 필수 (`gh auth status`)
 - GitHub 저장소 연결 필요
-- **처음 사용 시:** `/setup` 명령어로 Project, Labels 초기화 필요
+- **처음 사용 시:** `/init-github-superpowers` 명령어로 Project, Labels 초기화 필요
 - **마일스톤 관리:** `/milestone` 명령어로 마일스톤 생성/전환/종료
 
 ## 스킬 사용 규칙
@@ -103,7 +103,7 @@ digraph workflow {
 ## 관련 스킬
 
 **초기 설정:**
-- **setup**: Project, Labels 초기화 (처음 1회)
+- **init-github-superpowers**: Project, Labels 초기화 (처음 1회)
 - **milestone**: 마일스톤 생성/전환/종료 (수시)
 
 **설계 → 구현 계획:**

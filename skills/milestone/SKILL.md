@@ -106,5 +106,5 @@ gh api repos/{owner}/{repo}/milestones/$MILESTONE_NUMBER \
 
 ## 관련 스킬
 
-- **setup**: 초기 프로젝트 설정
+- **init-github-superpowers**: 초기 프로젝트 설정
 - **brainstorming**: 마일스톤이 null이면 선택 질문

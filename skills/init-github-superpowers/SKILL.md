@@ -1,5 +1,5 @@
 ---
-name: setup
+name: init-github-superpowers
 description: Use when first using github-superpowers in a repository - creates Project and Labels required for the workflow
 ---
 
@@ -7,7 +7,7 @@ description: Use when first using github-superpowers in a repository - creates P
 
 새 저장소에서 github-superpowers 워크플로우를 사용하기 전 필수 설정입니다.
 
-**Announce at start:** "setup 스킬을 사용하여 GitHub 프로젝트를 초기화합니다."
+**Announce at start:** "init-github-superpowers 스킬을 사용하여 GitHub 프로젝트를 초기화합니다."
 
 ## 워크플로우
 

@@ -106,7 +106,7 @@ PR 생성 및 이슈 종료:
 ### 초기 설정
 | 스킬 | 설명 |
 |------|------|
-| **setup** | Project, Labels 초기화 (처음 1회) |
+| **init-github-superpowers** | Project, Labels 초기화 (처음 1회) |
 | **milestone** | 마일스톤 생성/전환/종료 |
 
 ### 설계 → 구현 계획
