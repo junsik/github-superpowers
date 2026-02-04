@@ -16,18 +16,10 @@ GitHub Superpowers는 [Superpowers](https://github.com/obra/superpowers) 워크�
 
 ## 설치
 
-**Note:** 플랫폼별로 설치 방법이 다릅니다.
-
-### Claude Code (via Plugin Marketplace)
-
-Claude Code에서 marketplace 등록 후 설치:
+### Claude Code
 
 ```bash
-/plugin marketplace add junsik/github-superpowers-marketplace
-```
-
-```bash
-/plugin install github-superpowers@github-superpowers-marketplace
+/plugin install junsik/github-superpowers
 ```
 
 ### 설치 확인
