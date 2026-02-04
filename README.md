@@ -42,10 +42,10 @@ marketplace 등록 후 설치:
 
 ### 초기 설정
 
-처음 사용 시 `/setup` 명령어로 초기화:
+처음 사용 시 `/init-github-superpowers` 명령어로 초기화:
 
 ```bash
-/setup
+/init-github-superpowers
 ```
 
 이 명령어는:
@@ -203,7 +203,7 @@ PR 생성 및 이슈 종료:
 
 | 명령어 | 설명 |
 |--------|------|
-| `/setup` | 초기 설정 (Project, Labels) |
+| `/init-github-superpowers` | 초기 설정 (Project, Labels) |
 | `/milestone` | 마일스톤 관리 |
 
 ## 전제 조건
