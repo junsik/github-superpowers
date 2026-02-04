@@ -42,24 +42,21 @@ gh pr create \
 - [x] Lint clean
 - [x] Build succeeds
 
-Closes #[issue-number]
+Closes #[design-issue-number]
+Closes #[epic-number]
 EOF
 )"
 ```
 
 ## Issue 연결
 
-**커밋 메시지에 이슈 번호:**
-```bash
-git commit -m "feat: add feature
-
-Closes #123"
-```
-
-**PR 본문에 이슈 번호:**
+**PR에서 Design Issue와 Epic 모두 닫기:**
 ```markdown
-Closes #123
+Closes #[design-issue-number]
+Closes #[epic-number]
 ```
+
+**참고:** `Closes` 키워드는 PR에서만 작동합니다. Issue 본문에서는 작동하지 않습니다.
 
 ## PR 체크리스트
 
