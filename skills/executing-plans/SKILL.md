@@ -37,6 +37,21 @@ digraph executing {
 }
 ```
 
+## 컨텍스트 복구 (/clear 후 시작 시)
+
+```
+/clear 후 사용자 입력 예시:
+- "#43 구현해줘"
+- "#43 Task 3부터 이어서 해줘"
+- "impl.md 실행해줘"
+
+복구 순서:
+1. GitHub Issue 번호가 있으면 → `gh issue view #N` 으로 Epic 로드
+2. Task 번호가 있으면 → 해당 Task부터 시작
+3. 파일 경로가 있으면 → 해당 impl.md 읽기
+4. Epic 체크리스트에서 미완료 Task 확인 후 재개
+```
+
 ## Step 1: Load and Review Plan
 
 **1. 계획 로드:**
@@ -44,7 +59,7 @@ digraph executing {
 # impl.md에서 Epic 번호 추출
 EPIC_NUMBER=$(grep -oP '(?<=GitHub Epic:\*\* #)\d+' docs/plans/*-impl.md)
 
-# Epic 상태 확인
+# Epic 상태 확인 (체크리스트에서 진행 상황 파악)
 gh issue view $EPIC_NUMBER
 ```
 

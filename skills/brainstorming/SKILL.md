@@ -135,6 +135,24 @@ git commit -m "docs: link design issue #$DESIGN_NUMBER"
 - **대안 탐색** - 결정 전 2-3가지 접근법 제시
 - **점진적 검증** - 설계를 섹션별로 제시하고 각각 검증
 
+## 완료 후 (AskUserQuestion)
+
+design.md 저장 + Design Issue 생성 후:
+
+```
+AskUserQuestion:
+"설계가 완료되었습니다.
+- 저장: docs/plans/YYYY-MM-DD-<topic>-design.md
+- GitHub Issue: #N
+
+다음 단계는?"
+
+옵션:
+1. `/clear` 후 구현 계획 → 새 세션에서 "#N 구현 계획 세워줘"
+2. 이어서 구현 계획 (컨텍스트 유지)
+3. 오늘은 여기까지
+```
+
 ## 관련 스킬
 
 - **writing-plans**: design.md → impl.md → GitHub 이슈
