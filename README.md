@@ -28,6 +28,12 @@ marketplace 등록 후 설치:
 /plugin install github-superpowers@github-superpowers-marketplace
 ```
 
+### 업데이트
+
+```bash
+/plugin update github-superpowers
+```
+
 ### 초기 설정
 
 처음 사용 시 `/init-github-superpowers` 명령어로 초기화:
