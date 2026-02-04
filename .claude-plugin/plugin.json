@@ -1,0 +1,10 @@
+{
+  "name": "github-superpowers",
+  "description": "Complete development workflow with GitHub project management - combines superpowers methodology with GitHub Issues, Milestones, and Projects",
+  "version": "1.0.0",
+  "author": {
+    "name": "junsik"
+  },
+  "license": "MIT",
+  "keywords": ["workflow", "github", "tdd", "debugging", "planning", "issues", "projects", "milestones"]
+}

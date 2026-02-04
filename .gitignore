@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Worktrees (if using project-local)
+.worktrees/
+worktrees/
+
+# Logs
+*.log
+
+# Temp files
+*.tmp
+*.temp
