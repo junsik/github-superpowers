@@ -7,7 +7,12 @@ description: Use when you have a spec or requirements for a multi-step task, bef
 
 ## Overview
 
-엔지니어가 코드베이스에 대한 컨텍스트가 없다고 가정하고 상세한 구현 계획을 작성합니다.
+구현 **가이드**를 작성합니다. 무엇을 어떤 순서로 할지 명확히 정의합니다.
+
+**impl.md ≠ 코드 생성기**
+- 전체 구현 코드 작성 X
+- 핵심 인터페이스/타입 시그니처만
+- 접근법과 완료 기준에 집중
 
 **Announce at start:** "writing-plans 스킬을 사용하여 구현 계획을 작성합니다."
 
@@ -42,36 +47,44 @@ description: Use when you have a spec or requirements for a multi-step task, bef
 
 ## Task Structure
 
+**CRITICAL: impl.md는 구현 가이드이지, 구현 코드가 아닙니다.**
+
 ```markdown
 ### Task N: [Component Name]
 
+**목표:** [이 Task가 달성하는 것 - 1문장]
+
 **Files:**
 - Create: `exact/path/to/file.py`
-- Modify: `exact/path/to/existing.py:123-145`
+- Modify: `exact/path/to/existing.py` (함수명 또는 라인 범위)
 - Test: `tests/exact/path/to/test.py`
 
-**Step 1: Write the failing test**
-[코드]
+**접근법:**
+1. [무엇을 먼저 하고]
+2. [그 다음 무엇을 하고]
+3. [최종적으로 무엇을 확인]
 
-**Step 2: Run test to verify it fails**
-Run: `pytest tests/path/test.py::test_name -v`
-Expected: FAIL
-
-**Step 3: Write minimal implementation**
-[코드]
-
-**Step 4: Run test to verify it passes**
-Run: `pytest tests/path/test.py::test_name -v`
-Expected: PASS
-
-**Step 5: Commit**
-```bash
-git add tests/path/test.py src/path/file.py
-git commit -m "feat: add specific feature
-
-Refs #[epic-number]"
+**핵심 인터페이스:** (선택 - 복잡한 경우만)
+```python
+class SomeClass:
+    def method(self, arg: Type) -> ReturnType:
+        """한 줄 설명."""
+        ...
 ```
+
+**테스트 케이스:**
+- `test_happy_path`: 정상 동작 확인
+- `test_error_case`: 에러 처리 확인
+
+**완료 기준:**
+- [ ] 테스트 통과
+- [ ] 린터 통과
 ```
+
+**코드 스니펫 규칙:**
+- 시그니처 + docstring 수준만 (구현부는 `...` 또는 `pass`)
+- 전체 구현 코드 작성 금지 - `executing-plans`에서 작성
+- 복잡한 알고리즘이면 의사코드로 설명
 
 ## After the Plan
 
@@ -135,9 +148,10 @@ AskUserQuestion:
 ## Remember
 
 - 정확한 파일 경로
-- 완전한 코드 (추상적인 설명 X)
-- 정확한 명령어와 예상 출력
-- DRY, YAGNI, TDD, 빈번한 커밋
+- **구현 가이드** (전체 코드 X) - 코드는 `executing-plans`에서
+- 핵심 인터페이스/타입만 스니펫으로
+- Task당 목표 1개, 명확한 완료 기준
+- impl.md 목표 길이: 200-500줄 (2000줄 넘으면 분할 고려)
 
 ## 관련 스킬
 
