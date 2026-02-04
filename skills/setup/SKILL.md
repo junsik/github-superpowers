@@ -89,7 +89,33 @@ gh project field-create $PROJECT_ID \
 | Status | SINGLE_SELECT | Todo, In Progress, Done |
 | Priority | SINGLE_SELECT | High, Medium, Low |
 
-## 4. 설정 파일 생성
+## 4. 필드 ID 조회 및 설정 파일 생성
+
+```bash
+# 필드 ID 조회
+FIELDS=$(gh project field-list $PROJECT_NUMBER --owner <owner> --format json)
+START_DATE_ID=$(echo "$FIELDS" | jq -r '.fields[] | select(.name=="Start Date") | .id')
+END_DATE_ID=$(echo "$FIELDS" | jq -r '.fields[] | select(.name=="End Date") | .id')
+PRIORITY_ID=$(echo "$FIELDS" | jq -r '.fields[] | select(.name=="Priority") | .id')
+
+# Priority 옵션 ID 조회
+PRIORITY_OPTIONS=$(gh api graphql -f query='
+  query($projectId: ID!) {
+    node(id: $projectId) {
+      ... on ProjectV2 {
+        field(name: "Priority") {
+          ... on ProjectV2SingleSelectField {
+            options { id name }
+          }
+        }
+      }
+    }
+  }' -f projectId="$PROJECT_ID" --jq '.data.node.field.options')
+
+HIGH_ID=$(echo "$PRIORITY_OPTIONS" | jq -r '.[] | select(.name=="High") | .id')
+MEDIUM_ID=$(echo "$PRIORITY_OPTIONS" | jq -r '.[] | select(.name=="Medium") | .id')
+LOW_ID=$(echo "$PRIORITY_OPTIONS" | jq -r '.[] | select(.name=="Low") | .id')
+```
 
 `.github/github-superpowers.json` 생성:
 
@@ -98,15 +124,24 @@ gh project field-create $PROJECT_ID \
   "project": {
     "owner": "<owner>",
     "number": <project-number>,
+    "id": "<project-id>",
     "fields": {
-      "startDate": "Start Date",
-      "endDate": "End Date",
-      "priority": "Priority"
+      "startDate": { "name": "Start Date", "id": "<field-id>" },
+      "endDate": { "name": "End Date", "id": "<field-id>" },
+      "priority": {
+        "name": "Priority",
+        "id": "<field-id>",
+        "options": {
+          "high": "<option-id>",
+          "medium": "<option-id>",
+          "low": "<option-id>"
+        }
+      }
     }
   },
   "milestones": {
-    "current": "<milestone-title>",
-    "strategy": "version|quarter|sprint|manual"
+    "current": null,
+    "strategy": "version"
   },
   "labels": {
     "design": "design",

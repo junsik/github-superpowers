@@ -59,43 +59,28 @@ EPIC_URL=$(gh issue create \
   --label "epic,feat" \
   --milestone "$MILESTONE_TITLE")
 
-# Project에 추가 및 필드 설정
+# 설정 파일에서 Project 정보 읽기 (init 안했으면 에러)
+if [ ! -f .github/github-superpowers.json ]; then
+  echo "Error: .github/github-superpowers.json not found. Run /init-github-superpowers first."
+  exit 1
+fi
+
+PROJECT_ID=$(jq -r '.project.id' .github/github-superpowers.json)
+START_DATE_FIELD=$(jq -r '.project.fields.startDate.id' .github/github-superpowers.json)
+PRIORITY_FIELD=$(jq -r '.project.fields.priority.id' .github/github-superpowers.json)
+MEDIUM_OPTION_ID=$(jq -r '.project.fields.priority.options.medium' .github/github-superpowers.json)
+
+# Project에 추가
 ITEM_ID=$(gh project item-add $PROJECT_NUMBER \
   --owner $PROJECT_OWNER \
   --url "$EPIC_URL" \
   --format json | jq -r '.id')
 
-# Project ID 조회
-PROJECT_ID=$(gh project list --owner $PROJECT_OWNER --format json | \
-  jq -r '.projects[] | select(.number=='$PROJECT_NUMBER') | .id')
-
-# 필드 ID 조회
-FIELDS=$(gh project field-list $PROJECT_NUMBER --owner $PROJECT_OWNER --format json)
-START_DATE_FIELD=$(echo "$FIELDS" | jq -r '.fields[] | select(.name=="Start Date") | .id')
-END_DATE_FIELD=$(echo "$FIELDS" | jq -r '.fields[] | select(.name=="End Date") | .id')
-PRIORITY_FIELD=$(echo "$FIELDS" | jq -r '.fields[] | select(.name=="Priority") | .id')
-
 # Start Date 설정 (오늘)
 gh project item-edit --project-id $PROJECT_ID --id $ITEM_ID \
   --field-id $START_DATE_FIELD --date "$(date +%Y-%m-%d)"
 
-# Priority 설정 (사용자에게 질문 또는 기본값)
-# Priority 옵션 ID 조회
-PRIORITY_OPTIONS=$(gh api graphql -f query='
-  query($projectId: ID!) {
-    node(id: $projectId) {
-      ... on ProjectV2 {
-        field(name: "Priority") {
-          ... on ProjectV2SingleSelectField {
-            options { id name }
-          }
-        }
-      }
-    }
-  }' -f projectId="$PROJECT_ID" --jq '.data.node.field.options')
-
-# Medium을 기본값으로 설정 (또는 AskUserQuestion으로 선택)
-MEDIUM_OPTION_ID=$(echo "$PRIORITY_OPTIONS" | jq -r '.[] | select(.name=="Medium") | .id')
+# Priority 설정 (Medium 기본값)
 gh project item-edit --project-id $PROJECT_ID --id $ITEM_ID \
   --field-id $PRIORITY_FIELD --single-select-option-id $MEDIUM_OPTION_ID
 ```

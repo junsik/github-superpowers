@@ -170,14 +170,23 @@ PR 생성 및 이슈 종료:
   "project": {
     "owner": "<owner>",
     "number": 1,
+    "id": "<project-id>",
     "fields": {
-      "startDate": "Start Date",
-      "endDate": "End Date",
-      "priority": "Priority"
+      "startDate": { "name": "Start Date", "id": "<field-id>" },
+      "endDate": { "name": "End Date", "id": "<field-id>" },
+      "priority": {
+        "name": "Priority",
+        "id": "<field-id>",
+        "options": {
+          "high": "<option-id>",
+          "medium": "<option-id>",
+          "low": "<option-id>"
+        }
+      }
     }
   },
   "milestones": {
-    "current": "v1.0.0",
+    "current": null,
     "strategy": "version"
   },
   "labels": {
@@ -186,6 +195,8 @@ PR 생성 및 이슈 종료:
   }
 }
 ```
+
+> `/init-github-superpowers` 실행 시 자동 생성됩니다.
 
 ## Commands
 
