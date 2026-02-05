@@ -22,7 +22,9 @@ digraph brainstorming {
     "질문으로 탐색" [shape=box];
     "접근법 제시" [shape=box];
     "설계 검증" [shape=box];
-    "design.md 작성" [shape=box];
+    "design.md 초안" [shape=box];
+    "리뷰 사이클" [shape=diamond, style=filled, fillcolor=lightyellow];
+    "설계 확정" [shape=box];
     "Design Issue" [shape=box, style=filled, fillcolor=lightgreen];
     "다음 단계" [shape=diamond];
     "writing-plans" [shape=box, style=filled, fillcolor=lightgreen];
@@ -32,8 +34,11 @@ digraph brainstorming {
     "컨텍스트 파악" -> "질문으로 탐색";
     "질문으로 탐색" -> "접근법 제시";
     "접근법 제시" -> "설계 검증";
-    "설계 검증" -> "design.md 작성";
-    "design.md 작성" -> "Design Issue" [label="자동"];
+    "설계 검증" -> "design.md 초안";
+    "design.md 초안" -> "리뷰 사이클";
+    "리뷰 사이클" -> "design.md 초안" [label="수정"];
+    "리뷰 사이클" -> "설계 확정" [label="확정"];
+    "설계 확정" -> "Design Issue" [label="자동"];
     "Design Issue" -> "다음 단계";
     "다음 단계" -> "writing-plans" [label="구현 계획"];
     "다음 단계" -> "나중에" [label="저장만"];
@@ -58,11 +63,35 @@ digraph brainstorming {
 
 ## After the Design
 
-**1. 문서화:**
+**1. 문서화 (초안):**
 - `docs/plans/YYYY-MM-DD-<topic>-design.md`에 설계 저장
 - git commit
 
-**2. Milestone 확인:**
+**2. 리뷰 사이클 (AskUserQuestion):**
+
+```
+AskUserQuestion:
+"design.md 초안이 완성되었습니다.
+- 저장: docs/plans/YYYY-MM-DD-<topic>-design.md
+
+리뷰해주세요. 다음 중 선택:"
+
+옵션:
+1. 수정 필요 - 피드백 주시면 반영합니다
+2. 설계 확정 - Design Issue 생성으로 진행
+3. 처음부터 다시 - 접근 방식 재검토
+```
+
+**수정 필요 선택 시:**
+- 사용자 피드백 수렴
+- design.md 수정
+- git commit으로 변경사항 저장
+- 다시 리뷰 사이클로 돌아감 (반복)
+
+**설계 확정 선택 시:**
+- Milestone 확인 → Design Issue 생성 진행
+
+**3. Milestone 확인:**
 
 ```bash
 MILESTONE_TITLE=$(jq -r '.milestones.current' .github/github-superpowers.json)
