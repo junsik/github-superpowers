@@ -178,6 +178,31 @@ git commit -m "docs: link design issue #$DESIGN_NUMBER"
 - **대안 탐색** - 결정 전 2-3가지 접근법 제시
 - **점진적 검증** - 설계를 섹션별로 제시하고 각각 검증
 
+## AskUserQuestion 가이드
+
+질문할 때 **추천 항목과 이유**를 함께 제시:
+
+```
+AskUserQuestion:
+"어떤 상태 관리를 사용할까요?"
+
+옵션:
+1. Zustand (Recommended)
+   - 추천: 보일러플레이트 최소, FSD와 잘 맞음, 번들 크기 작음
+   - 비추천 상황: 복잡한 비동기 로직이 많은 경우
+2. Redux Toolkit
+   - 추천: 대규모 팀, 복잡한 상태 로직, 강력한 DevTools
+   - 비추천 상황: 간단한 앱에는 과함
+3. React Query만
+   - 추천: 서버 상태가 대부분인 경우
+   - 비추천 상황: 클라이언트 전용 상태가 많은 경우
+```
+
+**필수 포함 사항:**
+- 추천 항목 표시 (`Recommended`)
+- 각 옵션의 **추천 이유**
+- 각 옵션의 **비추천 상황/단점**
+
 ## 완료 후 (AskUserQuestion)
 
 design.md 저장 + Design Issue 생성 후:
