@@ -22,3 +22,6 @@ worktrees/
 # Temp files
 *.tmp
 *.temp
+
+# Claude Code
+.claude/

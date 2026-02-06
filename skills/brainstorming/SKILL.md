@@ -64,15 +64,15 @@ digraph brainstorming {
 ## After the Design
 
 **1. 문서화 (초안):**
-- `docs/plans/YYYY-MM-DD-<topic>-design.md`에 설계 저장
-- git commit
+- `.claude/github-superpowers/plans/YYYY-MM-DD-<topic>-design.md`에 설계 저장
+- git commit (하지 않음 - .gitignore됨)
 
 **2. 리뷰 사이클 (AskUserQuestion):**
 
 ```
 AskUserQuestion:
 "design.md 초안이 완성되었습니다.
-- 저장: docs/plans/YYYY-MM-DD-<topic>-design.md
+- 저장: .claude/github-superpowers/plans/YYYY-MM-DD-<topic>-design.md
 
 리뷰해주세요. 다음 중 선택:"
 
@@ -113,10 +113,13 @@ MILESTONE_TITLE=$(jq -r '.milestones.current' .github/github-superpowers.json)
 PROJECT_OWNER=$(jq -r '.project.owner' .github/github-superpowers.json)
 PROJECT_NUMBER=$(jq -r '.project.number' .github/github-superpowers.json)
 
+# design.md 내용 읽기
+DESIGN_BODY=$(cat .claude/github-superpowers/plans/YYYY-MM-DD-<topic>-design.md)
+
 # Design Issue 생성
 DESIGN_URL=$(gh issue create \
   --title "design: <feature-name>" \
-  --body-file docs/plans/YYYY-MM-DD-<topic>-design.md \
+  --body "$DESIGN_BODY" \
   --label "design" \
   --milestone "$MILESTONE_TITLE")  # 선택된 Milestone (없으면 생략)
 
@@ -144,11 +147,9 @@ DESIGN_NUMBER=$(echo "$DESIGN_URL" | grep -oE '[0-9]+$')
 
 # design.md 헤더에 Issue 링크 추가
 sed -i '1a\
-**GitHub Issue:** #'"$DESIGN_NUMBER"' ('"$DESIGN_URL"')' docs/plans/YYYY-MM-DD-<topic>-design.md
+**GitHub Issue:** #'"$DESIGN_NUMBER"' ('"$DESIGN_URL"')' .claude/github-superpowers/plans/YYYY-MM-DD-<topic>-design.md
 
-# 변경사항 커밋
-git add docs/plans/YYYY-MM-DD-<topic>-design.md
-git commit -m "docs: link design issue #$DESIGN_NUMBER"
+# 변경사항은 git ignore됨 - 커밋 불필요
 ```
 
 - design.md 내용을 Issue로 게시
@@ -210,7 +211,7 @@ design.md 저장 + Design Issue 생성 후:
 ```
 AskUserQuestion:
 "설계가 완료되었습니다.
-- 저장: docs/plans/YYYY-MM-DD-<topic>-design.md
+- 저장: .claude/github-superpowers/plans/YYYY-MM-DD-<topic>-design.md
 - GitHub Issue: #N
 
 다음 단계는?"
@@ -223,8 +224,32 @@ AskUserQuestion:
 ```
 
 **바로 구현 선택 시:**
-- impl.md, Epic 생성 생략
-- Design Issue를 참조하여 TDD로 구현
+
+impl.md, Epic 생성 생략하고 바로 구현. 실행 방식 선택:
+
+```
+AskUserQuestion:
+"구현 방식을 선택해주세요:"
+
+옵션:
+1. Agent Teams 사용 (Recommended) - 자동화된 빠른 구현
+   - 현재 브랜치에서 작업 (main/master이면 새 브랜치 생성)
+   - 서브에이전트가 자동으로 구현 및 테스트
+   - worktree 사용 불가
+2. 수동 구현 (워크트리 격리) - 단계별 직접 제어
+   - worktree로 격리된 브랜치에서 작업
+   - TDD 사이클을 직접 실행
+   - 서브에이전트 사용 불가
+```
+
+**Agent Teams 선택 시:**
+- 현재 브랜치 확인 (main/master이면 새 브랜치 생성)
+- 서브에이전트에게 Design Issue 내용 전달
+- **REQUIRED:** Use test-driven-development 스킬 (서브에이전트가)
+- 커밋에 `Refs #[design-issue-number]` 포함
+- PR에서 `Closes #[design-issue-number]`
+
+**수동 구현 선택 시:**
 - **REQUIRED:** Use using-git-worktrees 스킬
 - **REQUIRED:** Use test-driven-development 스킬
 - 커밋에 `Refs #[design-issue-number]` 포함

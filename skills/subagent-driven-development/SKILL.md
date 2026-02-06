@@ -37,6 +37,18 @@ digraph when_to_use {
 - 각 Task 후 두 단계 리뷰: 스펙 준수 먼저, 그 다음 코드 품질
 - 더 빠른 반복 (Task 간 human-in-loop 없음)
 
+## ⚠️ CRITICAL: Git Worktree 비호환
+
+**서브에이전트는 현재 워킹 디렉토리에서 작업합니다.**
+
+- 서브에이전트는 부모 에이전트의 워킹 디렉토리를 공유
+- worktree로 cd해도 서브에이전트는 원래 디렉토리에서 작업
+- **worktree와 함께 사용 금지** - 예상치 못한 브랜치에서 작업하게 됨
+
+**올바른 사용법:**
+1. **현재 브랜치에서 작업**: subagent-driven-development 사용
+2. **격리된 브랜치 필요**: executing-plans + worktree 사용 (서브에이전트 없이)
+
 ## The Process
 
 ```dot
@@ -128,6 +140,7 @@ Refs #$EPIC_NUMBER"
 ## Red Flags
 
 **Never:**
+- **worktree와 함께 사용** (서브에이전트는 현재 디렉토리에서만 작업)
 - 명시적 사용자 동의 없이 main/master 브랜치에서 구현 시작
 - 리뷰 건너뛰기 (스펙 준수 또는 코드 품질)
 - 수정 안 된 이슈로 진행
@@ -159,7 +172,6 @@ Refs #$EPIC_NUMBER"
 ## Integration
 
 **Required workflow skills:**
-- **using-git-worktrees** - REQUIRED: 시작 전 격리된 작업 공간 설정
 - **writing-plans** - 이 스킬이 실행하는 계획 생성
 - **requesting-code-review** - 리뷰어 서브에이전트를 위한 코드 리뷰 템플릿
 - **finishing-a-development-branch** - 모든 Task 후 개발 완료
@@ -168,7 +180,7 @@ Refs #$EPIC_NUMBER"
 - **test-driven-development** - 서브에이전트가 각 Task에 TDD 따름
 
 **Alternative workflow:**
-- **executing-plans** - 같은 세션 실행 대신 병렬 세션 사용
+- **executing-plans** - worktree 격리 필요 시 (서브에이전트 대신 수동 실행)
 
 ## 관련 스킬
 

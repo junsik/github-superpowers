@@ -13,6 +13,18 @@ Git worktrees create isolated workspaces sharing the same repository, allowing w
 
 **Announce at start:** "using-git-worktrees 스킬을 사용하여 격리된 작업 공간을 설정합니다."
 
+## ⚠️ CRITICAL: 서브에이전트와 비호환
+
+**서브에이전트(Agent Teams)는 worktree로 이동하지 않습니다.**
+
+- 서브에이전트는 부모 에이전트의 워킹 디렉토리를 공유
+- worktree로 cd 후 서브에이전트 호출 시, 서브에이전트는 원래 디렉토리에서 작업
+- **결과**: 예상과 다른 브랜치에서 변경사항 발생
+
+**사용 가이드:**
+- ✅ **수동 구현**: worktree + executing-plans (서브에이전트 없이)
+- ❌ **서브에이전트**: subagent-driven-development (worktree 없이 현재 브랜치에서)
+
 ## Directory Selection Process
 
 Follow this priority order:
@@ -211,9 +223,12 @@ Ready to implement auth feature
 ## Integration
 
 **Called by:**
-- **brainstorming** - 설계 승인 후 구현 시작 전
-- **executing-plans** - Task 실행 전 (REQUIRED)
+- **brainstorming** - 설계 승인 후 구현 시작 전 (서브에이전트 없이 구현 시)
+- **executing-plans** - Task 실행 전 (서브에이전트 없이 수동 구현 시)
 - Any skill needing isolated workspace
+
+**NOT compatible with:**
+- **subagent-driven-development** - 서브에이전트는 worktree로 이동 안 됨
 
 ## 관련 스킬
 

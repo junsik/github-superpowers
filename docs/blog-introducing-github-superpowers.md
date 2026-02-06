@@ -50,7 +50,7 @@ GitHub Superpowers는 이 간극을 메웁니다:
 brainstorming 스킬로 설계를 완료하면:
 
 ```markdown
-<!-- docs/plans/2024-01-15-user-auth-design.md -->
+<!-- .claude/github-superpowers/plans/2024-01-15-user-auth-design.md -->
 # User Authentication Design
 
 > GitHub Issue: #42
@@ -142,7 +142,7 @@ brainstorming 스킬을 사용하여 설계를 시작합니다.
 
 ```
 설계가 완료되었습니다.
-- 저장: docs/plans/2024-01-15-user-auth-design.md
+- 저장: .claude/github-superpowers/plans/2024-01-15-user-auth-design.md
 - GitHub Issue: #42 (design label)
 ```
 
@@ -150,7 +150,7 @@ brainstorming 스킬을 사용하여 설계를 시작합니다.
 
 ```
 impl.md 작성이 완료되었습니다.
-- 저장: docs/plans/2024-01-15-user-auth-impl.md
+- 저장: .claude/github-superpowers/plans/2024-01-15-user-auth-impl.md
 - GitHub Epic: #43 (4개 Task 체크리스트)
 ```
 

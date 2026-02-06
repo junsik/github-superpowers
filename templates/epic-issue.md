@@ -27,7 +27,7 @@ Closes #<design-issue-number>
 
 ## 구현 계획
 
-상세 계획: `docs/plans/YYYY-MM-DD-<feature>-impl.md`
+상세 계획: `.claude/github-superpowers/plans/YYYY-MM-DD-<feature>-impl.md`
 
 ## 검증 기준
 
@@ -68,7 +68,7 @@ Closes #<design-issue-number>
 
 ## 구현 계획
 
-상세 계획: `docs/plans/YYYY-MM-DD-<feature>-impl.md`
+상세 계획: `.claude/github-superpowers/plans/YYYY-MM-DD-<feature>-impl.md`
 
 ## 검증 기준
 

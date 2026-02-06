@@ -16,7 +16,7 @@ description: Use when you have a spec or requirements for a multi-step task, bef
 
 **Announce at start:** "writing-plans 스킬을 사용하여 구현 계획을 작성합니다."
 
-**Save plans to:** `docs/plans/YYYY-MM-DD-<feature-name>-impl.md`
+**Save plans to:** `.claude/github-superpowers/plans/YYYY-MM-DD-<feature-name>-impl.md`
 
 ## Bite-Sized Task Granularity
 
@@ -108,9 +108,9 @@ digraph after_plan {
 }
 ```
 
-**구현 시작 시:**
-- **REQUIRED:** Use test-driven-development 스킬
-- 각 Task별로 TDD 사이클 진행
+**구현 시작 시 (사용자가 "이어서 구현" 선택하면):**
+- **REQUIRED:** Use executing-plans 스킬
+- executing-plans의 Step 0에서 실행 방식 선택 (Agent Teams vs 수동 구현)
 - 커밋 메시지에 `Refs #[epic-number]` 포함
 - 마지막 커밋/PR에서 `Closes #[epic-number]`
 
@@ -121,15 +121,23 @@ impl.md 저장 + Epic 생성 후:
 ```
 AskUserQuestion:
 "구현 계획이 완료되었습니다.
-- 저장: docs/plans/YYYY-MM-DD-<feature>-impl.md
+- 저장: .claude/github-superpowers/plans/YYYY-MM-DD-<feature>-impl.md
 - GitHub Epic: #M (N개 Task)
 
 다음 단계는?"
 
 옵션:
-1. 이어서 구현 (Recommended, 서브에이전트 사용)
+1. 이어서 구현 (Recommended)
+   - executing-plans 스킬로 실행 방식 선택
+   - Agent Teams (자동) 또는 수동 구현 중 선택
 2. 오늘은 여기까지
 ```
+
+**"이어서 구현" 선택 시:**
+- **REQUIRED:** Use executing-plans 스킬
+- Step 0에서 실행 방식 선택:
+  - Agent Teams: subagent-driven-development (빠름, 현재 브랜치)
+  - 수동 구현: worktree + TDD (느림, 격리된 브랜치)
 
 ## Remember
 
@@ -143,4 +151,6 @@ AskUserQuestion:
 
 - **brainstorming**: 계획 전 설계
 - **creating-issues**: Epic 생성
+- **executing-plans**: 구현 실행 (다음 단계)
+- **subagent-driven-development**: Agent Teams 자동 실행
 - **test-driven-development**: TDD 구현

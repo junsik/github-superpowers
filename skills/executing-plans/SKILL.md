@@ -49,12 +49,43 @@ digraph executing {
 
 **감지되면:** 해당 스킬의 패턴/컨벤션을 코드 작성 시 따름
 
+## Step 0: Choose Execution Mode
+
+**사용자에게 실행 방식 확인 (AskUserQuestion):**
+
+```
+AskUserQuestion:
+"구현 계획을 실행하는 방식을 선택해주세요:"
+
+옵션:
+1. 서브에이전트 사용 (Recommended) - 자동화된 빠른 실행
+   - subagent-driven-development 스킬 사용
+   - 현재 브랜치에서 작업
+   - worktree 사용 불가
+   - Task별 자동 리뷰 포함
+2. 수동 실행 (워크트리 격리) - 단계별 직접 제어
+   - executing-plans 스킬로 계속
+   - worktree로 격리된 브랜치에서 작업
+   - 서브에이전트 사용 불가
+   - 각 Task를 직접 구현
+```
+
+**서브에이전트 선택 시:**
+- **REQUIRED:** Use subagent-driven-development 스킬
+- worktree 설정 건너뛰기 (비호환)
+- 현재 브랜치 확인 (main/master이면 새 브랜치 생성)
+
+**수동 실행 선택 시:**
+- **REQUIRED:** Use using-git-worktrees 스킬
+- 서브에이전트 사용 금지
+- 이 스킬로 계속 진행
+
 ## Step 1: Load and Review Plan
 
 **1. 계획 로드:**
 ```bash
 # impl.md에서 Epic 번호 추출
-EPIC_NUMBER=$(grep -oP '(?<=GitHub Epic:\*\* #)\d+' docs/plans/*-impl.md)
+EPIC_NUMBER=$(grep -oP '(?<=GitHub Epic:\*\* #)\d+' .claude/github-superpowers/plans/*-impl.md)
 
 # Epic 상태 확인 (체크리스트에서 진행 상황 파악)
 gh issue view $EPIC_NUMBER
@@ -65,10 +96,11 @@ gh issue view $EPIC_NUMBER
 - 우려가 있으면: **시작 전에 사용자에게 제기**
 - 우려가 없으면: TodoWrite 생성 후 진행
 
-**3. Worktree 설정 (REQUIRED):**
-- **REQUIRED:** Use using-git-worktrees 스킬
+**3. Worktree 설정 (수동 실행 모드만):**
+- **수동 실행 선택 시:** Use using-git-worktrees 스킬
 - main/master에서 직접 작업 금지
 - 격리된 worktree에서 작업
+- **서브에이전트 모드에서는 건너뛰기** (비호환)
 
 ## Step 2: Execute Tasks (TDD)
 
@@ -142,8 +174,12 @@ gh issue view $EPIC_NUMBER
 
 ## 관련 스킬
 
+**실행 방식:**
+- **subagent-driven-development**: 서브에이전트 자동 실행 (worktree 비호환)
+- **using-git-worktrees**: 격리된 작업 공간 (수동 실행 시 REQUIRED)
+
+**구현:**
 - **writing-plans**: impl.md 생성 (이전 단계)
-- **using-git-worktrees**: 격리된 작업 공간 (REQUIRED)
 - **test-driven-development**: 각 Task TDD 실행
 - **verification**: 완료 전 검증
 - **creating-prs**: PR 생성 (다음 단계)

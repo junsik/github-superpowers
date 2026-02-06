@@ -60,7 +60,7 @@ HEAD_SHA=$(git rev-parse HEAD)
 
 [Dispatch code-reviewer subagent]
   WHAT_WAS_IMPLEMENTED: conversation index 검증 및 복구 함수
-  PLAN_OR_REQUIREMENTS: Task 2 from docs/plans/deployment-plan.md
+  PLAN_OR_REQUIREMENTS: Task 2 from .claude/github-superpowers/plans/deployment-plan.md
   BASE_SHA: a7981ec
   HEAD_SHA: 3df7661
   DESCRIPTION: verifyIndex() 및 repairIndex() 추가, 4가지 이슈 타입

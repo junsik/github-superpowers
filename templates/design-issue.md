@@ -5,9 +5,12 @@ brainstorming 스킬에서 Design Issue 생성 시 사용합니다.
 ## 사용법
 
 ```bash
+# design.md 내용 읽기
+DESIGN_BODY=$(cat .claude/github-superpowers/plans/YYYY-MM-DD-<topic>-design.md)
+
 gh issue create \
   --title "design: <feature-name>" \
-  --body-file docs/plans/YYYY-MM-DD-<topic>-design.md \
+  --body "$DESIGN_BODY" \
   --label "design" \
   --milestone "$MILESTONE_TITLE"
 ```

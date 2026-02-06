@@ -40,12 +40,16 @@ PROJECT_OWNER=$(jq -r '.project.owner' .github/github-superpowers.json)
 PROJECT_NUMBER=$(jq -r '.project.number' .github/github-superpowers.json)
 MILESTONE_TITLE=$(jq -r '.milestones.current' .github/github-superpowers.json)
 
-# Epic body (Task를 체크리스트로)
+# impl.md 내용 읽기
+IMPL_CONTENT=$(cat .claude/github-superpowers/plans/YYYY-MM-DD-<feature-name>-impl.md)
+
+# Epic body 생성 (impl.md 내용 + 체크리스트)
 EPIC_BODY="## 설계 문서
 Closes #[design-issue-number]
 
 ## 구현 계획
-[impl.md 요약]
+
+${IMPL_CONTENT}
 
 ## Tasks
 - [ ] Task 1: [설명]
@@ -95,11 +99,9 @@ EPIC_NUMBER=$(echo "$EPIC_URL" | grep -oE '[0-9]+$')
 
 # impl.md 헤더에 Epic 링크 추가 (헤더 다음 줄에)
 sed -i '1a\
-**GitHub Epic:** #'"$EPIC_NUMBER"' ('"$EPIC_URL"')' docs/plans/YYYY-MM-DD-<feature-name>-impl.md
+**GitHub Epic:** #'"$EPIC_NUMBER"' ('"$EPIC_URL"')' .claude/github-superpowers/plans/YYYY-MM-DD-<feature-name>-impl.md
 
-# 변경사항 커밋
-git add docs/plans/YYYY-MM-DD-<feature-name>-impl.md
-git commit -m "docs: link epic #$EPIC_NUMBER to impl.md"
+# 변경사항은 git ignore됨 - 커밋 불필요
 ```
 
 **결과 예시:**

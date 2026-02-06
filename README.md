@@ -69,7 +69,7 @@ verification → creating-prs → Issue Close
 아이디어를 구체적인 설계로 발전시킵니다.
 
 - 질문을 통한 요구사항 정제
-- `docs/plans/YYYY-MM-DD-<topic>-design.md` 저장
+- `.claude/github-superpowers/plans/YYYY-MM-DD-<topic>-design.md` 저장
 - **자동으로 Design Issue 생성** (label: design)
 - design.md에 Issue 링크 자동 추가
 
@@ -79,7 +79,7 @@ verification → creating-prs → Issue Close
 
 - Task별 2-5분 단위 bite-sized 스텝
 - 정확한 파일 경로, 완전한 코드
-- `docs/plans/YYYY-MM-DD-<feature>-impl.md` 저장
+- `.claude/github-superpowers/plans/YYYY-MM-DD-<feature>-impl.md` 저장
 
 ### 3. Creating Issues (GitHub 연동)
 
