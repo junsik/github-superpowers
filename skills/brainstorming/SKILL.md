@@ -1,6 +1,6 @@
 ---
 name: brainstorming
-description: Use before any creative work - creating features, building components, adding functionality. Explores user intent and design before implementation.
+description: Use ONLY when user explicitly asks to "brainstorm", "design", or "explore ideas". NOT for implementation requests, bug fixes, or feature additions.
 ---
 
 # Brainstorming Ideas Into Designs
