@@ -54,19 +54,25 @@ NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE
 
 ## GitHub 연동
 
-**PR 생성 전 필수 검증:**
+**PR 생성 전 필수 검증 (백그라운드 병렬 실행):**
+
+검증 명령들은 서로 독립적이므로 **백그라운드로 동시 실행**하여 시간을 절약합니다:
 
 ```bash
-# 1. 테스트 실행
-npm test
+# 3개 검증을 백그라운드로 동시 실행
+Bash(command: "npm test", run_in_background: true)        # → task_id_1
+Bash(command: "npm run lint", run_in_background: true)     # → task_id_2
+Bash(command: "npm run build", run_in_background: true)    # → task_id_3
 
-# 2. 린터 실행
-npm run lint
+# 각 결과 수집 (완료될 때까지 대기)
+TaskOutput(task_id: task_id_1)  # 테스트 결과
+TaskOutput(task_id: task_id_2)  # 린터 결과
+TaskOutput(task_id: task_id_3)  # 빌드 결과
+```
 
-# 3. 빌드 실행
-npm run build
+**모든 검증 통과 후 PR 생성:**
 
-# 4. 모두 통과 확인 후 PR 생성
+```bash
 gh pr create --title "feat: feature name" --body "
 ## Verification
 
@@ -77,6 +83,11 @@ gh pr create --title "feat: feature name" --body "
 Closes #[issue-number]
 "
 ```
+
+**하나라도 실패하면:**
+- 실패한 검증의 전체 출력 확인
+- 수정 후 **모든 검증을 다시 실행** (부분 검증 금지)
+- 전부 통과할 때까지 반복
 
 ## The Bottom Line
 

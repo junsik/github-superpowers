@@ -1,33 +1,79 @@
 ---
 name: writing-plans
-description: Use when you have a spec or requirements for a multi-step task, before touching code
+description: Use when you have a spec or requirements for a multi-step task - enters Plan Mode for safe read-only exploration before writing implementation guide
 ---
 
-# Writing Plans
+# Writing Plans (Plan Mode)
 
 ## Overview
 
 구현 **가이드**를 작성합니다. 무엇을 어떤 순서로 할지 명확히 정의합니다.
+
+**Plan Mode(EnterPlanMode)를 사용하여** 코드베이스를 안전하게 탐색한 후 구현 계획을 작성합니다.
+계획 단계에서 Edit/Write가 물리적으로 차단되어 성급한 코드 수정을 방지합니다.
 
 **impl.md ≠ 코드 생성기**
 - 전체 구현 코드 작성 X
 - 핵심 인터페이스/타입 시그니처만
 - 접근법과 완료 기준에 집중
 
-**Announce at start:** "writing-plans 스킬을 사용하여 구현 계획을 작성합니다."
+**Announce at start:** "writing-plans 스킬을 사용하여 Plan Mode로 구현 계획을 작성합니다."
 
 **Save plans to:** `.claude/github-superpowers/plans/YYYY-MM-DD-<feature-name>-impl.md`
 
-## Bite-Sized Task Granularity
+## The Process
 
-**각 스텝은 하나의 액션 (2-5분):**
-- "failing test 작성" - 스텝
-- "실행하여 실패 확인" - 스텝
-- "최소 코드로 테스트 통과" - 스텝
-- "테스트 실행 및 통과 확인" - 스텝
-- "커밋" - 스텝
+```dot
+digraph writing_plans {
+    "EnterPlanMode" [shape=doublecircle, style=filled, fillcolor=lightyellow];
+    "코드베이스 탐색" [shape=box, label="코드베이스 탐색\n(읽기 전용)"];
+    "plan file 작성" [shape=box, label="plan file 작성\n(impl.md 형식)"];
+    "ExitPlanMode" [shape=diamond, style=filled, fillcolor=lightyellow, label="ExitPlanMode\n(사용자 승인)"];
+    "impl.md 저장" [shape=box];
+    "creating-issues" [shape=box, style=filled, fillcolor=lightgreen];
+    "Epic 생성" [shape=box];
+    "구현 시작" [shape=doublecircle];
 
-## Plan Document Header
+    "EnterPlanMode" -> "코드베이스 탐색";
+    "코드베이스 탐색" -> "plan file 작성";
+    "plan file 작성" -> "ExitPlanMode";
+    "ExitPlanMode" -> "plan file 작성" [label="반려"];
+    "ExitPlanMode" -> "impl.md 저장" [label="승인"];
+    "impl.md 저장" -> "creating-issues" [label="자동"];
+    "creating-issues" -> "Epic 생성";
+    "Epic 생성" -> "구현 시작";
+}
+```
+
+## Step 1: Enter Plan Mode
+
+**REQUIRED:** `EnterPlanMode`를 호출하여 Plan Mode에 진입합니다.
+
+Plan Mode에서는:
+- ✅ Glob, Grep, Read, WebFetch, WebSearch, AskUserQuestion 사용 가능
+- ❌ Edit, Write, NotebookEdit **차단** (코드 수정 불가)
+- ✅ plan file에 계획 작성 가능
+
+**plan file vs impl.md:**
+- plan file(`~/.claude/plans/`)은 **임시 리뷰용** — 승인 과정에서 사용
+- impl.md(`.claude/github-superpowers/plans/`)는 **영구 산출물** — 승인 후 Write tool로 저장
+- settings.json 변경 불필요 (impl.md 경로는 기능별로 동적이므로 고정 불가)
+
+## Step 2: Explore Codebase (Read-Only)
+
+Plan Mode 안에서 코드베이스를 탐색합니다:
+- 프로젝트 구조 파악 (Glob, Read)
+- 기존 패턴/컨벤션 확인 (Grep)
+- 관련 문서 검토 (design.md, CLAUDE.md 등)
+- 의존성/인터페이스 확인
+
+**목표:** 구현에 필요한 정보를 충분히 수집
+
+## Step 3: Write Plan (impl.md format)
+
+plan file에 아래 형식으로 구현 계획을 작성합니다.
+
+### Plan Document Header
 
 ```markdown
 # [Feature Name] Implementation Plan
@@ -40,12 +86,12 @@ description: Use when you have a spec or requirements for a multi-step task, bef
 
 **Tech Stack:** [핵심 기술/라이브러리]
 
-**GitHub Issue:** #[issue-number] (Epic)
+**GitHub Issue:** #[issue-number] (Epic - 승인 후 생성)
 
 ---
 ```
 
-## Task Structure
+### Task Structure
 
 **CRITICAL: impl.md는 구현 가이드이지, 구현 코드가 아닙니다.**
 
@@ -81,46 +127,63 @@ class SomeClass:
 - [ ] 린터 통과
 ```
 
-**코드 스니펫 규칙:**
+### Bite-Sized Task Granularity
+
+**각 스텝은 하나의 액션 (2-5분):**
+- "failing test 작성" - 스텝
+- "실행하여 실패 확인" - 스텝
+- "최소 코드로 테스트 통과" - 스텝
+- "테스트 실행 및 통과 확인" - 스텝
+- "커밋" - 스텝
+
+### Code Snippet Rules
+
 - 시그니처 + docstring 수준만 (구현부는 `...` 또는 `pass`)
 - 전체 구현 코드 작성 금지 - `executing-plans`에서 작성
 - 복잡한 알고리즘이면 의사코드로 설명
 
-## After the Plan
+## Step 4: Exit Plan Mode (Approval)
 
-**impl.md 완성 후 자동으로 GitHub 연동:**
+**REQUIRED:** 계획 작성이 완료되면 `ExitPlanMode`를 호출합니다.
 
-1. **REQUIRED:** Use creating-issues 스킬
-2. Epic 이슈 생성 (Task를 체크리스트로 포함)
-3. 프로젝트/마일스톤 연결
-4. impl.md에 Epic 번호 업데이트
+- 사용자가 plan file(impl.md 내용)을 리뷰
+- **승인:** 다음 단계로 진행
+- **반려:** 피드백 반영 후 plan file 수정 → 다시 ExitPlanMode
+
+## After Approval
+
+**ExitPlanMode 승인 후 자동으로 실행:**
+
+**1. impl.md 저장:**
+- plan file 내용을 `.claude/github-superpowers/plans/YYYY-MM-DD-<feature-name>-impl.md`에 저장
+- Write tool 사용 (Plan Mode 해제 후 사용 가능)
+
+**2. GitHub Epic 생성:**
+- **REQUIRED:** Use creating-issues 스킬
+- Epic 이슈 생성 (Task를 체크리스트로 포함)
+- 프로젝트/마일스톤 연결
+- impl.md에 Epic 번호 업데이트
 
 ```dot
 digraph after_plan {
-    "impl.md 완성" [shape=box];
+    "승인 완료" [shape=box];
+    "impl.md 저장" [shape=box];
     "creating-issues" [shape=box, style=filled, fillcolor=lightgreen];
     "Epic 생성" [shape=box];
     "구현 시작" [shape=doublecircle];
 
-    "impl.md 완성" -> "creating-issues" [label="자동"];
+    "승인 완료" -> "impl.md 저장";
+    "impl.md 저장" -> "creating-issues" [label="자동"];
     "creating-issues" -> "Epic 생성";
     "Epic 생성" -> "구현 시작";
 }
 ```
 
-**구현 시작 시 (사용자가 "이어서 구현" 선택하면):**
-- **REQUIRED:** Use executing-plans 스킬
-- executing-plans의 Step 0에서 실행 방식 선택 (Agent Teams vs 수동 구현)
-- 커밋 메시지에 `Refs #[epic-number]` 포함
-- 마지막 커밋/PR에서 `Closes #[epic-number]`
-
-## 완료 후 (AskUserQuestion)
-
-impl.md 저장 + Epic 생성 후:
+**3. 다음 단계 (AskUserQuestion):**
 
 ```
 AskUserQuestion:
-"구현 계획이 완료되었습니다.
+"구현 계획이 승인되었습니다.
 - 저장: .claude/github-superpowers/plans/YYYY-MM-DD-<feature>-impl.md
 - GitHub Epic: #M (N개 Task)
 
@@ -141,6 +204,7 @@ AskUserQuestion:
 
 ## Remember
 
+- **EnterPlanMode 필수** - 계획 단계에서 코드 수정 방지
 - 정확한 파일 경로
 - **구현 가이드** (전체 코드 X) - 코드는 `executing-plans`에서
 - 핵심 인터페이스/타입만 스니펫으로

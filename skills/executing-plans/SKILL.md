@@ -7,9 +7,10 @@ description: Use when you have impl.md to execute - follows TDD cycle per task w
 
 ## Overview
 
-impl.md의 Task를 순서대로 TDD로 실행하고, GitHub Epic 체크리스트를 업데이트합니다.
+impl.md의 Task를 실행하고, GitHub Epic 체크리스트를 업데이트합니다.
+Task 의존성을 분석하여 **순차 파이프라인, 병렬 팀, 수동 실행** 중 최적 방식을 선택합니다.
 
-**Core principle:** 각 Task는 TDD 사이클. Epic 체크리스트로 진행 추적.
+**Core principle:** 의존성 분석 → 최적 실행 방식 선택 → TDD → Epic 추적.
 
 **Announce at start:** "executing-plans 스킬을 사용하여 impl.md를 실행합니다."
 
@@ -49,35 +50,75 @@ digraph executing {
 
 **감지되면:** 해당 스킬의 패턴/컨벤션을 코드 작성 시 따름
 
+## Step 0: Analyze Task Dependencies
+
+**impl.md를 로드한 후, Task 간 의존성을 분석합니다:**
+
+```
+Task 1: DB 스키마 마이그레이션       ← 독립
+Task 2: API 엔드포인트 구현          ← Task 1 의존
+Task 3: 프론트엔드 컴포넌트          ← 독립
+Task 4: API 통합 테스트              ← Task 2 의존
+Task 5: E2E 테스트                   ← Task 2, 3 의존
+```
+
+**의존성 판단 기준:**
+- Task B가 Task A의 **출력 파일**을 사용하면 → 의존
+- Task B가 Task A의 **인터페이스/타입**을 참조하면 → 의존
+- 서로 **다른 파일/모듈**에서 독립적이면 → 독립
+
+**분석 결과를 사용자에게 제시:**
+```
+의존성 분석 결과:
+- 독립 그룹 A: Task 1, Task 3 (병렬 가능)
+- 순차 체인 B: Task 2 → Task 4 (Task 1 이후)
+- 순차 체인 C: Task 5 (Task 2, 3 이후)
+
+추천: Agent Team 병렬 (독립 Task를 동시 실행, 의존 Task는 순차)
+```
+
 ## Step 0: Choose Execution Mode
 
-**사용자에게 실행 방식 확인 (AskUserQuestion):**
+**의존성 분석 결과에 따라 실행 방식 추천 (AskUserQuestion):**
 
 ```
 AskUserQuestion:
 "구현 계획을 실행하는 방식을 선택해주세요:"
 
 옵션:
-1. 서브에이전트 사용 (Recommended) - 자동화된 빠른 실행
+1. Agent Team 파이프라인 (Recommended - 대부분의 경우)
    - subagent-driven-development 스킬 사용
-   - 현재 브랜치에서 작업
-   - worktree 사용 불가
-   - Task별 자동 리뷰 포함
-2. 수동 실행 (워크트리 격리) - 단계별 직접 제어
+   - 순차 실행 + 리뷰 파이프라인 (implementer → spec → quality)
+   - Task 간 의존성이 많을 때 적합
+   - 현재 브랜치에서 작업 (worktree 비호환)
+2. Agent Team 병렬 (독립 Task가 많을 때)
+   - dispatching-parallel-agents 스킬 사용
+   - 독립 Task는 동시 실행, 의존 Task는 순차 대기
+   - Task의 50% 이상이 독립적일 때 적합
+   - 현재 브랜치에서 작업 (worktree 비호환)
+3. 수동 실행 (워크트리 격리) - 단계별 직접 제어
    - executing-plans 스킬로 계속
    - worktree로 격리된 브랜치에서 작업
-   - 서브에이전트 사용 불가
-   - 각 Task를 직접 구현
+   - Agent Team 사용 불가
 ```
 
-**서브에이전트 선택 시:**
+**Agent Team 파이프라인 선택 시:**
 - **REQUIRED:** Use subagent-driven-development 스킬
+- TeamCreate로 파이프라인 팀 구성
 - worktree 설정 건너뛰기 (비호환)
+- 현재 브랜치 확인 (main/master이면 새 브랜치 생성)
+
+**Agent Team 병렬 선택 시:**
+- **REQUIRED:** Use dispatching-parallel-agents 스킬
+- 의존성 그래프에 따라 실행 순서 결정:
+  1. 독립 Task들을 병렬 에이전트로 동시 실행
+  2. 의존 Task는 선행 Task 완료 후 순차 실행
+  3. 각 wave 완료 시 Epic 체크리스트 업데이트
 - 현재 브랜치 확인 (main/master이면 새 브랜치 생성)
 
 **수동 실행 선택 시:**
 - **REQUIRED:** Use using-git-worktrees 스킬
-- 서브에이전트 사용 금지
+- Agent Team 사용 금지
 - 이 스킬로 계속 진행
 
 ## Step 1: Load and Review Plan
@@ -100,7 +141,7 @@ gh issue view $EPIC_NUMBER
 - **수동 실행 선택 시:** Use using-git-worktrees 스킬
 - main/master에서 직접 작업 금지
 - 격리된 worktree에서 작업
-- **서브에이전트 모드에서는 건너뛰기** (비호환)
+- **Agent Team 모드에서는 건너뛰기** (비호환)
 
 ## Step 2: Execute Tasks (TDD)
 
@@ -175,8 +216,10 @@ gh issue view $EPIC_NUMBER
 ## 관련 스킬
 
 **실행 방식:**
-- **subagent-driven-development**: 서브에이전트 자동 실행 (worktree 비호환)
+- **subagent-driven-development**: Agent Team 파이프라인 실행 (순차 + 리뷰)
+- **dispatching-parallel-agents**: Agent Team 병렬 실행 (독립 Task 동시)
 - **using-git-worktrees**: 격리된 작업 공간 (수동 실행 시 REQUIRED)
+- 위 3가지 모두 worktree와 비호환 (수동 실행 제외)
 
 **구현:**
 - **writing-plans**: impl.md 생성 (이전 단계)

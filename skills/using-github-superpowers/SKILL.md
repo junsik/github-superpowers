@@ -72,7 +72,7 @@ digraph workflow {
 ## 스킬 우선순위
 
 1. **설계 스킬** (brainstorming) - 무엇을 만들지 정의
-2. **계획 스킬** (writing-plans) - 상세 구현 계획 (Task 분해)
+2. **계획 스킬** (writing-plans) - Plan Mode로 상세 구현 계획 (Task 분해)
 3. **추적 스킬** (creating-issues) - impl.md 기반 Epic 자동 생성
 4. **실행 스킬** (executing-plans) - impl.md Task별 TDD 실행
 5. **검증 스킬** (verification) - 완료 전 확인
@@ -108,7 +108,7 @@ digraph workflow {
 
 **설계 → 구현 계획:**
 - **brainstorming**: 아이디어 → design.md → Design Issue (자동)
-- **writing-plans**: design.md → impl.md (Task 분해)
+- **writing-plans**: design.md → Plan Mode → impl.md (Task 분해)
 
 **GitHub 추적:**
 - **creating-issues**: impl.md → Epic (체크리스트로 Task 관리)

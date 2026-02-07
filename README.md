@@ -11,6 +11,9 @@ GitHub Superpowers는 [Superpowers](https://github.com/obra/superpowers) 워크�
 - **GitHub 통합**: Design Issue, Epic, Milestone, Project 자동 연동
 - **체크리스트 기반 Task 관리**: Epic 이슈에 Task를 체크리스트로 관리
 - **자동 이슈 링크**: design.md, impl.md에 GitHub Issue 링크 자동 삽입
+- **Plan Mode**: 구현 계획 시 읽기 전용 탐색 강제 (EnterPlanMode/ExitPlanMode)
+- **Agent Team 오케스트레이션**: TeamCreate + SendMessage로 에이전트 파이프라인 구성
+- **의존성 기반 병렬 실행**: Task 의존성 분석 후 독립 Task 동시 실행
 - **스택별 패턴**: Next.js (FSD), NestJS (Hexagonal), FastAPI 패턴 제공
 - **gh CLI 기반**: 모든 GitHub 작업을 gh CLI로 수행
 
@@ -55,13 +58,13 @@ marketplace 등록 후 설치:
     ↓
 brainstorming → design.md → Design Issue (#N)
     ↓
-writing-plans → impl.md
+writing-plans (Plan Mode) → impl.md
     ↓
 creating-issues → Epic (#M) with Task checklist
     ↓
-executing-plans → TDD per Task → Epic checklist update
+executing-plans (Agent Team / 병렬 / 수동) → TDD per Task → Epic checklist update
     ↓
-verification → creating-prs → Issue Close
+verification (백그라운드 병렬) → creating-prs → Issue Close
 ```
 
 ### 1. Brainstorming (설계)
@@ -75,11 +78,12 @@ verification → creating-prs → Issue Close
 
 ### 2. Writing Plans (구현 계획)
 
-설계를 상세 구현 계획으로 분해합니다.
+**Plan Mode** (EnterPlanMode/ExitPlanMode)를 활용하여 설계를 상세 구현 계획으로 분해합니다.
 
+- Plan Mode에서 읽기 전용 코드베이스 탐색 (Edit/Write 차단)
 - Task별 2-5분 단위 bite-sized 스텝
 - 정확한 파일 경로, 완전한 코드
-- `.claude/github-superpowers/plans/YYYY-MM-DD-<feature>-impl.md` 저장
+- ExitPlanMode로 사용자 승인 후 `.claude/github-superpowers/plans/YYYY-MM-DD-<feature>-impl.md` 저장
 
 ### 3. Creating Issues (GitHub 연동)
 
@@ -92,9 +96,11 @@ impl.md 기반으로 Epic 이슈를 자동 생성합니다.
 
 ### 4. Executing Plans (구현)
 
-각 Task를 TDD로 실행하고 Epic 체크리스트를 업데이트합니다.
+Task 의존성 분석 후 최적 실행 방식을 선택합니다.
 
-- **using-git-worktrees**: 격리된 작업 공간
+- **Agent Team 파이프라인**: TeamCreate로 implementer → spec-reviewer → quality-reviewer 파이프라인 구성
+- **Agent Team 병렬**: 독립 Task를 동시 실행, 의존 Task는 순차 대기
+- **수동 실행 (워크트리 격리)**: using-git-worktrees로 격리된 작업 공간
 - **test-driven-development**: RED-GREEN-REFACTOR
 - 커밋 메시지에 `Refs #<epic>` 포함
 - Task 완료 시 Epic 체크리스트 자동 체크
@@ -103,7 +109,7 @@ impl.md 기반으로 Epic 이슈를 자동 생성합니다.
 
 PR 생성 및 이슈 종료:
 
-- **verification**: 완료 전 최종 검증
+- **verification**: 백그라운드 병렬 검증 (test, lint, build 동시 실행)
 - **creating-prs**: PR에 `Closes #<epic>` 포함
 - **finishing-a-development-branch**: 머지/PR/폐기 선택
 
@@ -119,7 +125,7 @@ PR 생성 및 이슈 종료:
 | 스킬 | 설명 |
 |------|------|
 | **brainstorming** | 아이디어 → design.md → Design Issue |
-| **writing-plans** | design.md → impl.md (Task 분해) |
+| **writing-plans** | Plan Mode → impl.md (읽기 전용 탐색 + 승인 게이트) |
 
 ### GitHub 추적
 | 스킬 | 설명 |
@@ -132,12 +138,12 @@ PR 생성 및 이슈 종료:
 | 스킬 | 설명 |
 |------|------|
 | **using-git-worktrees** | 격리된 작업 공간 생성 |
-| **executing-plans** | impl.md Task별 TDD 실행 |
-| **subagent-driven-development** | 서브에이전트 기반 개발 |
-| **dispatching-parallel-agents** | 독립적 Task 병렬 실행 |
+| **executing-plans** | 의존성 분석 → 실행 방식 선택 → TDD 실행 |
+| **subagent-driven-development** | Agent Team 파이프라인 (구현→스펙리뷰→품질리뷰) |
+| **dispatching-parallel-agents** | Agent Team 병렬 실행 (SendMessage 소통) |
 | **test-driven-development** | TDD 사이클 |
 | **systematic-debugging** | 체계적 디버깅 |
-| **verification** | 완료 전 검증 |
+| **verification** | 백그라운드 병렬 검증 (test, lint, build) |
 
 ### 코드 리뷰
 | 스킬 | 설명 |
@@ -222,7 +228,8 @@ PR 생성 및 이슈 종료:
 - **Test-Driven Development** - 테스트 먼저, 항상
 - **GitHub as Source of Truth** - GitHub Issue로 진행 상태 추적
 - **자동화된 연결** - 설계 → 구현 → GitHub 자동 연동
-- **Evidence over Claims** - 성공 선언 전 검증
+- **Evidence over Claims** - 성공 선언 전 백그라운드 병렬 검증
+- **Agent Team Orchestration** - 에이전트 간 직접 소통으로 협업
 
 ## 기반
 
