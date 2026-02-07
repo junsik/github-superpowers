@@ -71,8 +71,11 @@ fi
 
 PROJECT_ID=$(jq -r '.project.id' .github/github-superpowers.json)
 START_DATE_FIELD=$(jq -r '.project.fields.startDate.id' .github/github-superpowers.json)
+END_DATE_FIELD=$(jq -r '.project.fields.endDate.id' .github/github-superpowers.json)
 PRIORITY_FIELD=$(jq -r '.project.fields.priority.id' .github/github-superpowers.json)
 MEDIUM_OPTION_ID=$(jq -r '.project.fields.priority.options.medium' .github/github-superpowers.json)
+ISSUE_TYPE_FIELD=$(jq -r '.project.fields.issueType.id' .github/github-superpowers.json)
+FEAT_TYPE_OPTION=$(jq -r '.project.fields.issueType.options.feat' .github/github-superpowers.json)
 
 # Project에 추가
 ITEM_ID=$(gh project item-add $PROJECT_NUMBER \
@@ -84,9 +87,22 @@ ITEM_ID=$(gh project item-add $PROJECT_NUMBER \
 gh project item-edit --project-id $PROJECT_ID --id $ITEM_ID \
   --field-id $START_DATE_FIELD --date "$(date +%Y-%m-%d)"
 
+# End Date 설정 (Milestone due date 사용, 없으면 오늘+14일)
+if [ -n "$MILESTONE_TITLE" ] && [ "$MILESTONE_TITLE" != "null" ]; then
+  MILESTONE_DUE=$(gh api repos/{owner}/{repo}/milestones \
+    --jq ".[] | select(.title==\"$MILESTONE_TITLE\") | .due_on" | cut -d'T' -f1)
+fi
+END_DATE=${MILESTONE_DUE:-$(date -d "+14 days" +%Y-%m-%d 2>/dev/null || date -v+14d +%Y-%m-%d)}
+gh project item-edit --project-id $PROJECT_ID --id $ITEM_ID \
+  --field-id $END_DATE_FIELD --date "$END_DATE"
+
 # Priority 설정 (Medium 기본값)
 gh project item-edit --project-id $PROJECT_ID --id $ITEM_ID \
   --field-id $PRIORITY_FIELD --single-select-option-id $MEDIUM_OPTION_ID
+
+# Issue Type 설정 (feat)
+gh project item-edit --project-id $PROJECT_ID --id $ITEM_ID \
+  --field-id $ISSUE_TYPE_FIELD --single-select-option-id $FEAT_TYPE_OPTION
 ```
 
 ## impl.md 업데이트

@@ -79,6 +79,13 @@ gh project field-create $PROJECT_ID \
   --name "Priority" \
   --data-type SINGLE_SELECT \
   --single-select-options "High,Medium,Low"
+
+# Issue Type 필드
+gh project field-create $PROJECT_ID \
+  --owner <owner> \
+  --name "Issue Type" \
+  --data-type SINGLE_SELECT \
+  --single-select-options "design,feat,fix,refactor,epic"
 ```
 
 **필수 필드:**
@@ -88,6 +95,7 @@ gh project field-create $PROJECT_ID \
 | End Date | DATE | 작업 완료 예정일 |
 | Status | SINGLE_SELECT | Todo, In Progress, Done |
 | Priority | SINGLE_SELECT | High, Medium, Low |
+| Issue Type | SINGLE_SELECT | design, feat, fix, refactor, epic |
 
 ## 4. 필드 ID 조회 및 설정 파일 생성
 
@@ -115,6 +123,29 @@ PRIORITY_OPTIONS=$(gh api graphql -f query='
 HIGH_ID=$(echo "$PRIORITY_OPTIONS" | jq -r '.[] | select(.name=="High") | .id')
 MEDIUM_ID=$(echo "$PRIORITY_OPTIONS" | jq -r '.[] | select(.name=="Medium") | .id')
 LOW_ID=$(echo "$PRIORITY_OPTIONS" | jq -r '.[] | select(.name=="Low") | .id')
+
+# Issue Type 필드 ID 조회
+ISSUE_TYPE_ID=$(echo "$FIELDS" | jq -r '.fields[] | select(.name=="Issue Type") | .id')
+
+# Issue Type 옵션 ID 조회
+ISSUE_TYPE_OPTIONS=$(gh api graphql -f query='
+  query($projectId: ID!) {
+    node(id: $projectId) {
+      ... on ProjectV2 {
+        field(name: "Issue Type") {
+          ... on ProjectV2SingleSelectField {
+            options { id name }
+          }
+        }
+      }
+    }
+  }' -f projectId="$PROJECT_ID" --jq '.data.node.field.options')
+
+DESIGN_TYPE_ID=$(echo "$ISSUE_TYPE_OPTIONS" | jq -r '.[] | select(.name=="design") | .id')
+FEAT_TYPE_ID=$(echo "$ISSUE_TYPE_OPTIONS" | jq -r '.[] | select(.name=="feat") | .id')
+FIX_TYPE_ID=$(echo "$ISSUE_TYPE_OPTIONS" | jq -r '.[] | select(.name=="fix") | .id')
+REFACTOR_TYPE_ID=$(echo "$ISSUE_TYPE_OPTIONS" | jq -r '.[] | select(.name=="refactor") | .id')
+EPIC_TYPE_ID=$(echo "$ISSUE_TYPE_OPTIONS" | jq -r '.[] | select(.name=="epic") | .id')
 ```
 
 `.github/github-superpowers.json` 생성:
@@ -135,6 +166,17 @@ LOW_ID=$(echo "$PRIORITY_OPTIONS" | jq -r '.[] | select(.name=="Low") | .id')
           "high": "<option-id>",
           "medium": "<option-id>",
           "low": "<option-id>"
+        }
+      },
+      "issueType": {
+        "name": "Issue Type",
+        "id": "<field-id>",
+        "options": {
+          "design": "<option-id>",
+          "feat": "<option-id>",
+          "fix": "<option-id>",
+          "refactor": "<option-id>",
+          "epic": "<option-id>"
         }
       }
     }

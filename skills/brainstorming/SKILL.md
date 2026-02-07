@@ -46,7 +46,41 @@ digraph brainstorming {
 ```
 
 **1. 아이디어 이해:**
-- 프로젝트 상태 파악 (파일, 문서, 최근 커밋)
+
+**1-1. 컨텍스트 탐색 방법 선택 (AskUserQuestion):**
+
+```
+AskUserQuestion:
+"프로젝트 컨텍스트 파악을 어떻게 할까요?"
+
+옵션:
+1. Explore 서브에이전트 (Recommended) - 빠른 탐색
+   - 추천: 파일 구조, README, 설정 파일 등 빠르게 훑기
+   - 마스터 컨텍스트 절약, 병렬 탐색 가능
+   - 비추천 상황: 복잡한 코드 구조/참조 관계 파악이 필요한 경우
+2. Serena MCP (마스터 에이전트) - 정밀 분석
+   - 추천: 클래스 계층, 메서드 참조, 심볼릭 분석이 필요한 경우
+   - 코드 구조를 정확하게 파악 가능
+   - 비추천 상황: 마스터 컨텍스트를 많이 소비함
+3. 둘 다 사용 - 최대 정보 수집
+   - 추천: 대규모 프로젝트에서 빠른 개요 + 핵심부 정밀 분석 조합
+   - Explore로 전체 구조 파악 후, Serena로 핵심 심볼 분석
+   - 비추천 상황: 간단한 프로젝트에는 과함
+```
+
+**Explore 서브에이전트 선택 시:**
+- Task tool (subagent_type=Explore)로 프로젝트 구조, README, 설정 파일 탐색
+- 결과를 마스터 에이전트가 요약 수신
+
+**Serena MCP 선택 시:**
+- `get_symbols_overview`, `find_symbol`, `search_for_pattern` 등 활용
+- 마스터 에이전트가 직접 심볼릭 분석 수행
+
+**둘 다 선택 시:**
+- Explore 서브에이전트로 전체 구조/파일 목록 파악 (병렬)
+- 핵심 파일/심볼은 Serena MCP로 정밀 분석
+
+**1-2. 아이디어 정제:**
 - 한 번에 하나씩 질문하여 아이디어 정제
 - 가능하면 객관식 질문 선호
 - 메시지당 질문 하나
@@ -131,6 +165,9 @@ fi
 
 PROJECT_ID=$(jq -r '.project.id' .github/github-superpowers.json)
 START_DATE_FIELD=$(jq -r '.project.fields.startDate.id' .github/github-superpowers.json)
+END_DATE_FIELD=$(jq -r '.project.fields.endDate.id' .github/github-superpowers.json)
+ISSUE_TYPE_FIELD=$(jq -r '.project.fields.issueType.id' .github/github-superpowers.json)
+DESIGN_TYPE_OPTION=$(jq -r '.project.fields.issueType.options.design' .github/github-superpowers.json)
 
 # Project에 추가
 ITEM_ID=$(gh project item-add $PROJECT_NUMBER \
@@ -141,6 +178,19 @@ ITEM_ID=$(gh project item-add $PROJECT_NUMBER \
 # Start Date 설정 (오늘)
 gh project item-edit --project-id $PROJECT_ID --id $ITEM_ID \
   --field-id $START_DATE_FIELD --date "$(date +%Y-%m-%d)"
+
+# End Date 설정 (Milestone due date 사용, 없으면 오늘+14일)
+if [ -n "$MILESTONE_TITLE" ] && [ "$MILESTONE_TITLE" != "null" ]; then
+  MILESTONE_DUE=$(gh api repos/{owner}/{repo}/milestones \
+    --jq ".[] | select(.title==\"$MILESTONE_TITLE\") | .due_on" | cut -d'T' -f1)
+fi
+END_DATE=${MILESTONE_DUE:-$(date -d "+14 days" +%Y-%m-%d 2>/dev/null || date -v+14d +%Y-%m-%d)}
+gh project item-edit --project-id $PROJECT_ID --id $ITEM_ID \
+  --field-id $END_DATE_FIELD --date "$END_DATE"
+
+# Issue Type 설정 (design)
+gh project item-edit --project-id $PROJECT_ID --id $ITEM_ID \
+  --field-id $ISSUE_TYPE_FIELD --single-select-option-id $DESIGN_TYPE_OPTION
 
 # Issue 번호 추출
 DESIGN_NUMBER=$(echo "$DESIGN_URL" | grep -oE '[0-9]+$')
