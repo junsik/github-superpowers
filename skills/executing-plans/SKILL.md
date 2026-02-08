@@ -14,10 +14,25 @@ Task 의존성을 분석하여 **순차 파이프라인, 병렬 팀, 수동 실�
 
 **Announce at start:** "executing-plans 스킬을 사용하여 impl.md를 실행합니다."
 
+## Step 0: Load Design Document
+
+**impl.md 헤더의 `Design Document` 링크를 확인하고, design.md를 읽습니다.**
+
+```
+**Design Document:** [design-md](YYYY-MM-DD-<topic>-design.md)
+```
+
+- design.md 링크가 있으면 **반드시 먼저 읽어서** 전체 설계 컨텍스트를 파악
+- impl.md의 각 Task에 `Design Reference` 섹션이 있으면 해당 design.md 섹션과 대조
+- design.md가 없으면 impl.md만으로 진행
+
+**에이전트 팀 사용 시:** lead가 design.md를 읽고, Task 할당 메시지에 관련 스펙을 포함하여 전달
+
 ## The Process
 
 ```dot
 digraph executing {
+    "design.md 로드" [shape=box, style=filled, fillcolor=lightyellow];
     "impl.md 로드" [shape=doublecircle];
     "Epic 번호 확인" [shape=box];
     "Task 선택" [shape=box];
@@ -27,6 +42,7 @@ digraph executing {
     "다음 Task?" [shape=diamond];
     "PR 생성" [shape=box, style=filled, fillcolor=lightgreen];
 
+    "design.md 로드" -> "impl.md 로드";
     "impl.md 로드" -> "Epic 번호 확인";
     "Epic 번호 확인" -> "Task 선택";
     "Task 선택" -> "TDD 사이클";

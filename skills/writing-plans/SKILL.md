@@ -94,23 +94,30 @@ plan file에 아래 형식으로 구현 계획을 작성합니다.
 ### Task Structure
 
 **CRITICAL: impl.md는 구현 가이드이지, 구현 코드가 아닙니다.**
+**CRITICAL: 하지만 에이전트가 impl.md만으로 구현할 수 있을 만큼 충분한 스펙을 포함해야 합니다.**
 
-```markdown
+````markdown
 ### Task N: [Component Name]
 
 **목표:** [이 Task가 달성하는 것 - 1문장]
+
+**Design Reference:** design.md §[관련 섹션명]
 
 **Files:**
 - Create: `exact/path/to/file.py`
 - Modify: `exact/path/to/existing.py` (함수명 또는 라인 범위)
 - Test: `tests/exact/path/to/test.py`
 
+**구현 스펙:** (design.md에서 이 Task에 필요한 핵심 스펙을 인라인)
+- Backend: API 응답 DTO 전체 필드, 비즈니스 로직 규칙, 엣지 케이스
+- Frontend: 레이아웃 구조, 컴포넌트 동작, 상태 UX, 스타일링 규칙
+
 **접근법:**
 1. [무엇을 먼저 하고]
 2. [그 다음 무엇을 하고]
 3. [최종적으로 무엇을 확인]
 
-**핵심 인터페이스:** (선택 - 복잡한 경우만)
+**핵심 인터페이스:**
 ```python
 class SomeClass:
     def method(self, arg: Type) -> ReturnType:
@@ -122,10 +129,33 @@ class SomeClass:
 - `test_happy_path`: 정상 동작 확인
 - `test_error_case`: 에러 처리 확인
 
+**수용 기준:** (design.md Acceptance Criteria에서 이 Task 해당 항목)
+- [ ] AC-XX-X: [시나리오와 확인 항목]
+
 **완료 기준:**
 - [ ] 테스트 통과
 - [ ] 린터 통과
-```
+````
+
+### Design-Aware Task 원칙
+
+**에이전트는 impl.md만 읽고 구현한다.** 따라서:
+
+1. **Backend Task 필수 포함:**
+   - API 응답 DTO 인터페이스 (시그니처가 아닌 전체 필드 정의)
+   - 비즈니스 로직 규칙 (계산식, 분모/분자, 정렬 기준)
+   - 엣지 케이스 (0분모, null, 빈 데이터)
+
+2. **Frontend Task 필수 포함:**
+   - 레이아웃 구조 (와이어프레임 텍스트 설명 또는 인라인)
+   - 컴포넌트별 동작 (클릭, 필터, 폴링, 상태 전환)
+   - 반응형 규칙 (breakpoint별 변화)
+   - 상태 UX (loading/empty/error 처리)
+   - 스타일링 상세 (색상, 강조, 조건부 표시)
+
+3. **공통:**
+   - design.md Acceptance Criteria를 Task별로 분배
+   - `Design Reference`로 원본 섹션 추적 가능하게
 
 ### Bite-Sized Task Granularity
 
@@ -138,7 +168,8 @@ class SomeClass:
 
 ### Code Snippet Rules
 
-- 시그니처 + docstring 수준만 (구현부는 `...` 또는 `pass`)
+- **인터페이스/DTO**: 전체 필드 정의 포함 (에이전트가 정확한 응답 구조를 알아야 함)
+- **구현 로직**: 시그니처 + docstring 수준만 (구현부는 `...` 또는 `pass`)
 - 전체 구현 코드 작성 금지 - `executing-plans`에서 작성
 - 복잡한 알고리즘이면 의사코드로 설명
 
@@ -207,9 +238,11 @@ AskUserQuestion:
 - **EnterPlanMode 필수** - 계획 단계에서 코드 수정 방지
 - 정확한 파일 경로
 - **구현 가이드** (전체 코드 X) - 코드는 `executing-plans`에서
-- 핵심 인터페이스/타입만 스니펫으로
-- Task당 목표 1개, 명확한 완료 기준
-- impl.md 목표 길이: 200-500줄 (2000줄 넘으면 분할 고려)
+- **Design-Aware**: 에이전트가 impl.md만으로 구현 가능해야 함 — 필수 스펙 인라인
+- DTO/인터페이스는 전체 필드 포함, 구현 로직은 시그니처만
+- Task당 목표 1개, 명확한 완료 기준 + 수용 기준(AC)
+- **줄 수보다 충실도**: "에이전트가 design.md 없이 이 Task를 구현할 수 있는가?"가 기준
+- 규모가 큰 설계는 MVP 단위로 impl.md를 분할하여 각각 별도 Epic으로 관리
 
 ## 관련 스킬
 

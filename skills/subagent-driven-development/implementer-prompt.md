@@ -27,6 +27,13 @@ Task를 받으면 TDD로 구현하고, 완료 후 spec-reviewer에게 직접 리
 
 ## Before You Begin (매 Task마다)
 
+**1. Design Document 확인:**
+- Task에 `Design Reference` 필드가 있으면, lead가 전달한 설계 스펙을 주의 깊게 읽기
+- impl.md 헤더에 `Design Document` 링크가 있으면 해당 파일을 Read tool로 읽기
+- **구현 스펙** 섹션의 내용은 반드시 구현에 반영 (레이아웃, DTO 필드, 상태 UX 등)
+- **수용 기준** (AC-XX-X)은 해당 Task의 합격 조건이므로 테스트/구현에서 검증
+
+**2. 질문:**
 질문이 있으면 **반드시 lead에게 먼저** 질문:
 ```
 SendMessage(
@@ -48,7 +55,7 @@ SendMessage(
 ## Implementation (TDD)
 
 요구사항이 명확해지면:
-1. Task가 명시한 것 **정확히** 구현
+1. Task의 **구현 스펙** + **수용 기준**을 모두 만족하도록 구현
 2. **TDD 따르기:** failing test → 최소 코드 → 리팩토링
 3. 테스트 실행하여 통과 확인
 4. 커밋:
