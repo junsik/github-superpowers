@@ -1,15 +1,7 @@
 ---
 name: using-github-superpowers
-description: Use when starting any conversation - establishes development workflow with GitHub project tracking, requiring skill invocation before ANY response
+description: Development workflow with GitHub project tracking - establishes skill chain and work-size routing
 ---
-
-<EXTREMELY-IMPORTANT>
-스킬이 적용될 가능성이 1%라도 있으면, 반드시 해당 스킬을 발동해야 합니다.
-
-스킬이 적용되는 작업이면 선택의 여지가 없습니다. 반드시 사용해야 합니다.
-
-협상 불가. 선택 불가. 합리화로 빠져나갈 수 없습니다.
-</EXTREMELY-IMPORTANT>
 
 # GitHub Superpowers 워크플로우
 
@@ -20,25 +12,34 @@ description: Use when starting any conversation - establishes development workfl
 - **처음 사용 시:** `/init-github-superpowers` 명령어로 Project, Labels 초기화 필요
 - **마일스톤 관리:** `/milestone` 명령어로 마일스톤 생성/전환/종료
 
-## 스킬 사용 규칙
+## 작업 규모별 경로
 
-**응답이나 행동 전에 관련 스킬을 먼저 호출하세요.** 1%라도 적용 가능성이 있으면 호출합니다.
+작업 규모를 먼저 판단하고, 적절한 경로를 선택합니다.
 
 ```dot
-digraph skill_flow {
-    "메시지 수신" [shape=doublecircle];
-    "스킬 적용 가능?" [shape=diamond];
-    "Skill tool 호출" [shape=box];
-    "스킬 따라 실행" [shape=box];
-    "응답" [shape=doublecircle];
+digraph routing {
+    "요청 수신" [shape=doublecircle];
+    "규모 판단" [shape=diamond];
+    "Quick Path" [shape=box, style=filled, fillcolor=lightcyan];
+    "Standard Path" [shape=box, style=filled, fillcolor=lightyellow];
+    "Full Path" [shape=box, style=filled, fillcolor=lightsalmon];
 
-    "메시지 수신" -> "스킬 적용 가능?";
-    "스킬 적용 가능?" -> "Skill tool 호출" [label="yes, 1%라도"];
-    "스킬 적용 가능?" -> "응답" [label="확실히 없음"];
-    "Skill tool 호출" -> "스킬 따라 실행";
-    "스킬 따라 실행" -> "응답";
+    "요청 수신" -> "규모 판단";
+    "규모 판단" -> "Quick Path" [label="1-2 파일\n명확한 범위"];
+    "규모 판단" -> "Standard Path" [label="3-5 파일\n중간 복잡도"];
+    "규모 판단" -> "Full Path" [label="6+ 파일\n설계 필요"];
 }
 ```
+
+| 경로 | 기준 | 스킬 체인 |
+|------|------|-----------|
+| **Quick** | 버그 수정, 작은 기능, 1-2 파일 변경 | TDD → verification → commit |
+| **Standard** | 중간 기능, 3-5 파일, 기존 패턴 따름 | writing-plans → executing-plans → verification → PR |
+| **Full** | 새 기능/아키텍처, 6+ 파일, 설계 판단 필요 | brainstorming → writing-plans → creating-issues → executing-plans → verification → PR |
+
+## 스킬 사용 규칙
+
+작업에 관련 스킬이 있으면 Skill tool로 호출합니다. 모델이 작업 내용을 보고 적절한 스킬을 자율 판단합니다.
 
 ## 전체 워크플로우
 
@@ -78,27 +79,18 @@ digraph workflow {
 5. **검증 스킬** (verification) - 완료 전 확인
 6. **완료 스킬** (creating-prs, closing-issues) - PR 및 이슈 종료
 
-## Red Flags
+## 일반 가이드라인
 
-이런 생각이 들면 **멈추세요** - 합리화입니다:
-
-| 생각 | 현실 |
-|------|------|
-| "간단한 질문이야" | 질문도 작업. 스킬 확인. |
-| "먼저 컨텍스트 파악" | 스킬이 탐색 방법을 알려줌. 먼저 확인. |
-| "계획 없이 바로 코드" | brainstorm → plan → 이슈 → 구현 순서. |
-| "이슈는 나중에" | impl.md 완성 후 자동 생성됨. 순서 지켜. |
-| "TDD는 과해" | 간단한 것도 복잡해짐. 사용. |
-| "나중에 테스트" | 나중에 = 절대 안 함. 지금 TDD. |
-| "검증은 알아서" | verification 스킬 사용. |
+- 규모가 큰 작업은 설계 → 계획 → 이슈 → 구현 순서를 따르면 효과적
+- TDD는 작은 변경에서도 회귀 방지에 효과적 — 규모 판단 후 적용
+- 검증은 주장 전에 — verification 스킬이 체계적 검증 지원
+- 커밋/PR 전에는 테스트·빌드·린트 결과를 직접 확인
 
 ## 스킬 타입
 
-**Rigid** (TDD, debugging): 정확히 따르세요. 유연하게 적용 금지.
+**Rigid** (TDD, debugging): 핵심 원칙을 따릅니다. 이유는 각 스킬이 설명합니다.
 
-**Flexible** (patterns): 원칙을 컨텍스트에 맞게 적용.
-
-스킬 자체가 어떤 타입인지 알려줍니다.
+**Flexible** (patterns): 원칙을 컨텍스트에 맞게 적용합니다.
 
 ## 관련 스킬
 

@@ -36,7 +36,7 @@ cat <<EOF
 {
   "hookSpecificOutput": {
     "hookEventName": "SessionStart",
-    "additionalContext": "<EXTREMELY_IMPORTANT>\nYou have GitHub Superpowers.\n\n**Below is the full content of your 'github-superpowers:using-github-superpowers' skill - your development workflow with GitHub project tracking. For all other skills, use the 'Skill' tool:**\n\n---\n${skill_escaped}\n</EXTREMELY_IMPORTANT>"
+    "additionalContext": "<IMPORTANT>\nYou have GitHub Superpowers.\n\n**Below is the full content of your 'github-superpowers:using-github-superpowers' skill - your development workflow with GitHub project tracking. For all other skills, use the 'Skill' tool:**\n\n---\n${skill_escaped}\n</IMPORTANT>"
   }
 }
 EOF

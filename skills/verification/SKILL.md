@@ -7,17 +7,13 @@ description: Use when about to claim work is complete, fixed, or passing, before
 
 ## Overview
 
-검증 없이 완료를 주장하는 것은 효율이 아니라 거짓입니다.
+**Why verify?** "통과할 것이다"라는 가정은 코드 변경의 부작용을 놓칩니다. 실제 명령 실행 결과만이 현재 상태의 증거입니다. 캐시된 기억이나 추론은 증거가 아닙니다.
 
-**Core principle:** 증거가 주장보다 먼저, 항상.
+**Core principle:** 증거가 주장보다 먼저.
 
-## The Iron Law
+## 핵심 원칙
 
-```
-NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE
-```
-
-이 메시지에서 검증 명령을 실행하지 않았다면, 통과를 주장할 수 없습니다.
+완료를 주장하기 전에 검증 명령을 새로 실행하세요. 이전 실행 결과는 코드 변경 후 유효하지 않습니다.
 
 ## The Gate Function
 
@@ -43,14 +39,13 @@ NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE
 | 빌드 성공 | 빌드 명령: exit 0 | 린터 통과, 로그 괜찮아 보임 |
 | 버그 수정됨 | 원래 증상 테스트: 통과 | 코드 변경, 수정됐다고 가정 |
 
-## Red Flags - STOP
+## 주의 신호
 
-- "should", "probably", "seems to" 사용
-- 검증 전 만족 표현 ("Great!", "Perfect!", "Done!")
-- 검증 없이 커밋/푸시/PR
-- 부분 검증에 의존
-- "이번 한 번만" 생각
-- 피곤해서 끝내고 싶음
+검증이 불충분할 수 있는 징후:
+
+- **"should", "probably" 같은 추측성 언어** → 실행 결과가 아닌 추론에 의존 중
+- **부분 검증만 수행** → 한 테스트 통과가 전체 통과를 보장하지 않음
+- **검증 전 만족 표현** → 결과 확인 전 결론을 내린 것
 
 ## GitHub 연동
 
@@ -91,11 +86,7 @@ Closes #[issue-number]
 
 ## The Bottom Line
 
-**검증에 지름길 없음.**
-
-명령 실행. 출력 읽기. 그 다음 결과 주장.
-
-협상 불가.
+명령 실행 → 출력 확인 → 결과 주장. 이 순서가 신뢰할 수 있는 유일한 경로입니다.
 
 ## 관련 스킬
 

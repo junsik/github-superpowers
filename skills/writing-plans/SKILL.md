@@ -173,6 +173,18 @@ class SomeClass:
 - 전체 구현 코드 작성 금지 - `executing-plans`에서 작성
 - 복잡한 알고리즘이면 의사코드로 설명
 
+## Step 3.5: Plan Stress Test (Self-Check)
+
+**ExitPlanMode 전에 각 Task를 검증합니다:**
+
+각 Task에 대해 스스로 질문:
+1. **구현 충분성:** "이 Task의 정보만으로 에이전트가 design.md 없이 구현할 수 있는가?"
+2. **스펙 완전성:** Backend — DTO 전체 필드, 비즈니스 규칙, 엣지 케이스 포함? Frontend — 레이아웃, 상태 UX, 스타일링 규칙 포함?
+3. **수용 기준:** design.md의 Acceptance Criteria가 Task별로 분배되어 있는가?
+4. **테스트 가능성:** 완료 기준이 자동화된 테스트로 검증 가능한가?
+
+**하나라도 "아니오"면** 해당 Task를 보강한 후 ExitPlanMode.
+
 ## Step 4: Exit Plan Mode (Approval)
 
 **REQUIRED:** 계획 작성이 완료되면 `ExitPlanMode`를 호출합니다.

@@ -181,12 +181,38 @@ gh issue view $EPIC_NUMBER
    ```
 5. **Mark completed**
 
-## Step 3: Batch Checkpoint
+## Step 3: MVP Check-in Gate
 
-3개 Task마다 중간 보고:
+**전체 Task의 ~50% 완료 시점에서 설계 정렬 확인:**
+
+```
+AskUserQuestion:
+"MVP 체크인 — Task N/M 완료:
+
+## 완료된 Task
+- [x] Task 1: ...
+- [x] Task 2: ...
+
+## 현재 상태
+- 테스트: X/Y 통과
+- design.md 스펙 준수: [이슈 있으면 명시]
+
+## 발견 사항 (있으면)
+- [계획과 다른 점, 추가 필요한 것]
+
+계속 진행할까요?"
+
+옵션:
+1. 계속 진행 (Recommended)
+2. 피드백 반영 후 계속
+3. 여기서 멈추고 리뷰
+```
+
+**Why?** 전체 구현 후 설계 불일치를 발견하면 되돌리기 비용이 큽니다. 중간 체크인으로 조기에 방향을 교정합니다.
+
+추가로 **3개 Task마다 간단한 중간 보고:**
 - 완료된 Task 목록
 - 테스트 통과 상태
-- "피드백 주세요."
 
 ## Step 4: Complete
 

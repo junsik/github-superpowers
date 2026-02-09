@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-02-09
+
+### Added
+
+- **Design-Aware Task 구조** (`writing-plans`): impl.md Task에 `Design Reference`, `구현 스펙`, `수용 기준` 필드 추가 — 에이전트가 design.md 없이도 구현 가능하도록 스펙 인라인
+- **Plan Stress Test** (`writing-plans`): Step 3.5에 셀프체크 게이트 추가 — 구현 충분성, 스펙 완전성, AC 분배, 테스트 가능성 4개 항목 검증 후 ExitPlanMode
+- **MVP Check-in Gate** (`executing-plans`): 전체 Task의 ~50% 시점에서 설계 정렬 확인하는 AskUserQuestion 체크인 추가
+- **Design Document 로드** (`executing-plans`): Step 0에 design.md 사전 읽기 단계 추가, Agent Team 사용 시 lead가 관련 스펙을 Task 할당 메시지에 포함
+- **Design Document 확인** (`implementer-prompt.md`): 매 Task 시작 전 Design Reference 필드 및 design.md 링크 확인 절차 추가
+- **작업 규모별 경로 분기** (`using-github-superpowers`): Quick (1-2 파일) / Standard (3-5 파일) / Full (6+ 파일) 경로 라우팅
+
+### Changed
+
+- **Opus 4.6 톤 최적화** (`using-github-superpowers`): `<EXTREMELY-IMPORTANT>` 강제 호출 제거 → 자율 판단 기반 스킬 선택, Red Flags 테이블 → 일반 가이드라인
+- **Opus 4.6 톤 최적화** (`session-start.sh`): `EXTREMELY_IMPORTANT` → `IMPORTANT` 태그
+- **Why-first 규칙** (`test-driven-development`): Iron Law / Red Flags → "Why TDD?" 이유 설명 + 주의 신호
+- **Why-first 규칙** (`verification`): Iron Law / Red Flags → "Why verify?" 이유 설명 + 주의 신호
+- **Code Snippet Rules** (`writing-plans`): DTO/인터페이스는 전체 필드 정의 필수, 구현 로직은 시그니처만, 줄 수 제한 → 충실도 기준으로 전환
+
 ## [1.1.0] - 2025-02-07
 
 ### Added
