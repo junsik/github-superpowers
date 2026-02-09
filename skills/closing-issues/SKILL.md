@@ -62,10 +62,13 @@ Serena MCP가 활성화된 프로젝트라면, 구현 완료 후 축적된 지�
 - 중요한 설계 결정이 내려진 경우
 
 ```
-# 1. 기존 메모리 확인
+# 1. Serena 프로젝트 활성화 (등록된 프로젝트명 또는 경로)
+activate_project("<project-name>")
+
+# 2. 기존 메모리 확인
 list_memories
 
-# 2. 변경사항에 맞는 메모리 업데이트
+# 3. 변경사항에 맞는 메모리 업데이트
 # 새 모듈 추가 → codebase_structure 업데이트
 edit_memory("codebase_structure", mode="literal",
   needle="[관련 섹션]",

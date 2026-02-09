@@ -65,14 +65,19 @@ Plan Mode 진입 후, 코드베이스 탐색 전에 Serena 메모리를 로드�
 이전 세션에서 축적된 구조/패턴 지식을 활용하면 탐색 범위를 크게 줄일 수 있습니다.
 
 ```
-# 1. 사용 가능한 메모리 확인
+# 1. Serena 프로젝트 활성화 (등록된 프로젝트명 또는 경로)
+activate_project("<project-name>")
+
+# 2. 사용 가능한 메모리 확인
 list_memories
 
-# 2. 구현 계획에 관련된 메모리 선택 로드 (우선순위순)
+# 3. 구현 계획에 관련된 메모리 선택 로드 (우선순위순)
 read_memory("codebase_structure")            # 디렉토리 구조, 모듈 배치
 read_memory("architecture_and_conventions")  # 아키텍처 패턴, DI 패턴, 네이밍
 read_memory("style_and_patterns")            # 코드 스타일, UseCase/Port/Adapter 패턴
 ```
+
+**activate_project 실패 시** (프로젝트 미등록): Serena 메모리를 건너뛰고 Step 2로 진행.
 
 **메모리가 충분한 경우:** Step 2에서 이미 아는 구조는 건너뛰고, 변경 대상 파일/심볼만 집중 탐색.
 **메모리가 없거나 Serena 미사용:** 이 단계를 건너뛰고 Step 2로 진행합니다.

@@ -51,14 +51,19 @@ Serena MCP가 활성화된 프로젝트라면, 컨텍스트 탐색 전에 축적
 새 세션에서 코드베이스를 처음부터 다시 탐색하는 비용을 줄여줍니다.
 
 ```
-# 1. 사용 가능한 메모리 확인
+# 1. Serena 프로젝트 활성화 (등록된 프로젝트명 또는 경로)
+activate_project("<project-name>")
+
+# 2. 사용 가능한 메모리 확인
 list_memories
 
-# 2. 이름 기반으로 관련 메모리 선택 로드 (우선순위순)
+# 3. 이름 기반으로 관련 메모리 선택 로드 (우선순위순)
 read_memory("project_overview")              # 프로젝트 목적, 기술 스택, 전체 구조
 read_memory("architecture_and_conventions")  # 아키텍처 패턴, 코딩 컨벤션
 read_memory("design_decisions_*")            # 최근 설계 결정사항 (있으면)
 ```
+
+**activate_project 실패 시** (프로젝트 미등록): Serena 메모리를 건너뛰고 Step 1-1로 진행.
 
 **메모리가 충분한 경우:** Step 1-1에서 전체 탐색 대신 변경된 부분만 확인하면 됩니다.
 **메모리가 없거나 Serena 미사용:** 이 단계를 건너뛰고 Step 1-1로 진행합니다.
