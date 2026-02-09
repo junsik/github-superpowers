@@ -59,6 +59,24 @@ Plan Mode에서는:
 - impl.md(`.claude/github-superpowers/plans/`)는 **영구 산출물** — 승인 후 Write tool로 저장
 - settings.json 변경 불필요 (impl.md 경로는 기능별로 동적이므로 고정 불가)
 
+## Step 1.5: Serena 메모리 로드 (Optional)
+
+Plan Mode 진입 후, 코드베이스 탐색 전에 Serena 메모리를 로드합니다.
+이전 세션에서 축적된 구조/패턴 지식을 활용하면 탐색 범위를 크게 줄일 수 있습니다.
+
+```
+# 1. 사용 가능한 메모리 확인
+list_memories
+
+# 2. 구현 계획에 관련된 메모리 선택 로드 (우선순위순)
+read_memory("codebase_structure")            # 디렉토리 구조, 모듈 배치
+read_memory("architecture_and_conventions")  # 아키텍처 패턴, DI 패턴, 네이밍
+read_memory("style_and_patterns")            # 코드 스타일, UseCase/Port/Adapter 패턴
+```
+
+**메모리가 충분한 경우:** Step 2에서 이미 아는 구조는 건너뛰고, 변경 대상 파일/심볼만 집중 탐색.
+**메모리가 없거나 Serena 미사용:** 이 단계를 건너뛰고 Step 2로 진행합니다.
+
 ## Step 2: Explore Codebase (Read-Only)
 
 Plan Mode 안에서 코드베이스를 탐색합니다:
@@ -67,7 +85,7 @@ Plan Mode 안에서 코드베이스를 탐색합니다:
 - 관련 문서 검토 (design.md, CLAUDE.md 등)
 - 의존성/인터페이스 확인
 
-**목표:** 구현에 필요한 정보를 충분히 수집
+**목표:** 구현에 필요한 정보를 충분히 수집 (Step 1.5의 메모리로 이미 파악된 부분은 생략)
 
 ## Step 3: Write Plan (impl.md format)
 

@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Design Document 로드** (`executing-plans`): Step 0에 design.md 사전 읽기 단계 추가, Agent Team 사용 시 lead가 관련 스펙을 Task 할당 메시지에 포함
 - **Design Document 확인** (`implementer-prompt.md`): 매 Task 시작 전 Design Reference 필드 및 design.md 링크 확인 절차 추가
 - **작업 규모별 경로 분기** (`using-github-superpowers`): Quick (1-2 파일) / Standard (3-5 파일) / Full (6+ 파일) 경로 라우팅
+- **Serena 메모리 로드** (`brainstorming`): Step 0에 Serena 메모리 로드 추가 — 컨텍스트 탐색 전 project_overview, architecture_and_conventions 등 축적된 지식 선로드
+- **Serena 메모리 로드** (`writing-plans`): Step 1.5에 Serena 메모리 로드 추가 — Plan Mode 진입 후 codebase_structure, style_and_patterns 등 선로드로 탐색 범위 축소
+- **Serena 메모리 업데이트** (`closing-issues`): 이슈 종료 후 edit_memory/write_memory로 새 모듈, 아키텍처 변경, 설계 결정 반영 — 로드→저장 라이프사이클 완성
 
 ### Changed
 

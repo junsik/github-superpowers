@@ -49,6 +49,39 @@ gh issue view [epic-number]
 - [ ] PR 머지 확인
 - [ ] 테스트 통과 확인
 - [ ] 완료 코멘트 작성
+- [ ] Serena 메모리 업데이트 (해당 시)
+
+## Serena 메모리 업데이트 (Optional)
+
+Serena MCP가 활성화된 프로젝트라면, 구현 완료 후 축적된 지식을 메모리에 반영합니다.
+다음 세션에서 설계/구현 시 코드베이스를 처음부터 다시 탐색하지 않도록 해줍니다.
+
+**업데이트가 필요한 경우:**
+- 새 모듈/엔티티/서비스가 추가된 경우
+- 아키텍처 패턴이나 컨벤션이 변경된 경우
+- 중요한 설계 결정이 내려진 경우
+
+```
+# 1. 기존 메모리 확인
+list_memories
+
+# 2. 변경사항에 맞는 메모리 업데이트
+# 새 모듈 추가 → codebase_structure 업데이트
+edit_memory("codebase_structure", mode="literal",
+  needle="[관련 섹션]",
+  repl="[업데이트된 내용]")
+
+# 아키텍처/패턴 변경 → architecture_and_conventions 업데이트
+edit_memory("architecture_and_conventions", mode="literal",
+  needle="[관련 섹션]",
+  repl="[업데이트된 내용]")
+
+# 중요한 설계 결정 → 새 메모리 생성 또는 기존 메모리 추가
+write_memory("design_decisions_YYYY_MM_DD",
+  content="# 설계 결정사항\n\n- [결정 내용과 근거]")
+```
+
+**업데이트 불필요:** 단순 버그 수정, 리팩토링 등 구조 변경이 없는 경우 건너뜁니다.
 
 ## 관련 스킬
 
